@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -117,7 +117,7 @@ class TeraWurflDatabase_MySQL4 extends TeraWurflDatabase{
 				$this->dbcon->query("INSERT INTO `".TeraWurflConfig::$TABLE_PREFIX.'Index'."` (`deviceID`,`matcher`) VALUE (".$this->SQLPrep($device['id']).",".$this->SQLPrep($matcher).")");
 				// convert device root to tinyint format (0|1) for db
 				if(strlen($device['user_agent']) > 255){
-					$insert_errors[] = "Warning: user agent too long: \"".($device['id']).'"';
+					$device['user_agent'] = substr($device['user_agent'], 0, 255);
 				}
 				$insertcache[] = sprintf("(%s,%s,%s,%s,%s,%s)",
 					$this->SQLPrep($device['id']),

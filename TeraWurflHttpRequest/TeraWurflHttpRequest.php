@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -35,11 +35,8 @@ class TeraWurflHttpRequest {
 	 * @var array
 	 */
 	private $_user_agent_search_order = array(
-		'HTTP_X_DEVICE_USER_AGENT',
-		'HTTP_X_ORIGINAL_USER_AGENT',
+		'HTTP_DEVICE_STOCK_UA',
 		'HTTP_X_OPERAMINI_PHONE_UA',
-		'HTTP_X_SKYFIRE_PHONE',
-		'HTTP_X_BOLT_PHONE_UA',
 		'HTTP_USER_AGENT',
 	);
 	private $_user_agent_key;
@@ -202,6 +199,11 @@ class TeraWurflHttpRequest {
 		return null;
 	}
 	
+	/**
+	 * Returns the request HTTP header
+	 * @param string $name
+	 * @return TeraWurflHttpRequestHeader or null if the header does not exist
+	 */
 	public function getHeader($name) {
 		if (array_key_exists($name, $this->_http_headers)) {
 			return $this->_http_headers[$name];

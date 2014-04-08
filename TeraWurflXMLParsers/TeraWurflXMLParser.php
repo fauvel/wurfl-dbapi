@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -65,12 +65,16 @@ abstract class TeraWurflXMLParser {
      * @var string XML Data
      */
 	protected $xml;
+	protected $capability_filter = false;
 
     /**
      * Instantiates an XML Parser
      */
     public function __construct() {
-
+    	if (TeraWurflConfig::$CAPABILITY_FILTER && is_array(TeraWurflConfig::$CAPABILITY_FILTER)) {
+			// Merge given capabilities and capabilities required for virtual capabilities
+			$this->capability_filter = array_unique(array_merge(TeraWurflConfig::$CAPABILITY_FILTER, VirtualCapabilityProvider::getRequiredCapabilities()));
+    	}
     }
     /**
      * Opens the given $filename for processing
@@ -93,7 +97,7 @@ abstract class TeraWurflXMLParser {
 		if($value === 'false')return false;
 		// Clean Numeric values by loosely comparing the (float) to the (string)
 		$numval = (float)$value;
-		if(strcmp($value,$numval)==0)$value=$numval;
+		if (strcmp($value, $numval) == 0) $value = $numval;
 		return $value;
 	}
     /**
@@ -102,7 +106,7 @@ abstract class TeraWurflXMLParser {
      * @return bool
      */
 	protected function enabled($cap_or_group){
-		return in_array($cap_or_group,TeraWurflConfig::$CAPABILITY_FILTER);
+		return in_array($cap_or_group, $this->capability_filter);
 	}
 
     /**

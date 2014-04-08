@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,8 @@
  */
 class ChromeUserAgentMatcher extends UserAgentMatcher {
 	
+	public $runtime_normalization = true;
+	
 	public static $constantIDs = array(
 		'google_chrome'
 	);
@@ -31,8 +33,8 @@ class ChromeUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
-		$tolerance = $this->userAgent->indexOfOrLength('/', $this->userAgent->indexOf('Chrome'));
-		return $this->risMatch($tolerance);
+		$this->userAgent->set(substr($this->userAgent, $this->userAgent->indexOf('Chrome')));
+		return $this->risMatch($this->userAgent->indexOfOrLength('.'));
 	}
 	public function applyRecoveryMatch() {
 		return 'google_chrome';

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,6 +22,7 @@
 class NokiaOviBrowserUserAgentMatcher extends UserAgentMatcher {
 	
 	public static $constantIDs = array(
+		'nokia_generic_series30plus',
 		'nokia_generic_series40_ovibrosr',
 	);
 	
@@ -36,6 +37,11 @@ class NokiaOviBrowserUserAgentMatcher extends UserAgentMatcher {
 		return $this->risMatch($tolerance);
 	}
 	public function applyRecoveryMatch() {
-		return 'nokia_generic_series40_ovibrosr';
+		if ($this->userAgent->contains("Series30Plus")) {
+			return 'nokia_generic_series30plus';	
+		} else {
+			return 'nokia_generic_series40_ovibrosr';	
+		}
+		
 	}
 }

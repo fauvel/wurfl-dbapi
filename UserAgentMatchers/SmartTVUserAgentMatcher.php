@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,8 @@ class SmartTVUserAgentMatcher extends UserAgentMatcher {
 		$tolerance = $this->userAgent->length();
 		return $this->risMatch($tolerance);
 	}
-	public function applyRecoveryMatch(){
+	
+	public function applyRecoveryMatch() {
 		if ($this->userAgent->contains('SmartTV')) return 'generic_smarttv_browser';
 		if ($this->userAgent->contains('GoogleTV')) return 'generic_smarttv_googletv_browser';
 		if ($this->userAgent->contains('AppleTV')) return 'generic_smarttv_appletv_browser';

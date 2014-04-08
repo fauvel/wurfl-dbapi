@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,11 +20,11 @@
  * @package TeraWurfl
  *
  */
-class WurflConstants{
+class WurflConstants {
 
-    /**#@+
-     * @var string WURFL IDs
-     */
+	/**#@+
+	 * @var string WURFL IDs
+	 */
 	const NO_MATCH = 'generic';
 	const GENERIC = 'generic';
 	const GENERIC_MOBILE = 'generic_mobile';
@@ -33,36 +33,44 @@ class WurflConstants{
 	const GENERIC_WEB_BROWSER = 'generic_web_browser';
 	const SIMPLE_DESKTOP_UA = 'HighPerformanceMatcher/';
 	const RIS_DELIMITER = '---';
-    /**#@-*/
-	
+	/**#@-*/
+
 	/**
-     * @var array Array of UserAgentMatcher names
-     */
+	 * @var array Array of UserAgentMatcher names
+	 */
 	public static $matchers = array(
-		/**** Java Midlets ****/
-		'JavaMidlet',
-	
 		
+		/**** Smart TVs ****/
 		'SmartTV',
-		
+
 		/**** Mobile devices ****/
 		'Kindle',
-		'LGUPLUS',
-	
+		
+		/**** UCWEB ****/
+		'UcwebU3',
+		'UcwebU2',
+			
 		/**** Mobile platforms ****/
+		// Android Matcher Chain
+		'OperaMiniOnAndroid',
+		'OperaMobiOrTabletOnAndroid',
+		'FennecOnAndroid',
+		'Ucweb7OnAndroid',
+		'NetFrontOnAndroid',
 		'Android',
+		
 		'Apple',
 		'WindowsPhoneDesktop',
 		'WindowsPhone',
 		'NokiaOviBrowser', // must come before the Nokia matcher
-		
+
 		/**** High workload mobile matchers ****/
 		'Nokia',
 		'Samsung',
 		'BlackBerry',
 		'SonyEricsson',
 		'Motorola',
-		
+
 		/**** Other mobile matchers ****/
 		'Alcatel',
 		'BenQ',
@@ -71,9 +79,10 @@ class WurflConstants{
 		'HTCMac',
 		'HTC',
 		'Kddi',
-		'Konqueror',
 		'Kyocera',
 		'LG',
+		'LGUPLUS',
+		'Maemo',
 		'Mitsubishi',
 		'Nec',
 		'Nintendo',
@@ -87,27 +96,42 @@ class WurflConstants{
 		'Sanyo',
 		'Sharp',
 		'Siemens',
+		'Skyfire',
 		'SPV',
 		'Toshiba',
 		'Vodafone',
 		'WebOS',
 		// Opera Mini goes after the specific mobile matchers
 		'OperaMini',
-		
+		'FirefoxOS',
+				
+		/**** Java Midlets ****/
+		'JavaMidlet',
+
+		/**** Tablet Browsers ****/
+		'WindowsRT',
+
 		/**** Robots / Crawlers ****/
 		'Bot',
-		
+
+		/**** Game Consoles ****/
+		'Xbox',
+	
+		/**** DesktopApplications ****/
+		'DesktopApplication',
+
 		/**** Desktop Browsers ****/
 		'Chrome',
 		'Firefox',
 		'MSIE',
 		'Opera',
 		'Safari',
-		
+		'Konqueror',
+
 		/**** All other requests ****/
 		'CatchAll',
 	);
-	
+
 	/**
 	 * These mobile browser strings will be compared case-insensitively, so keep them all lowercase for faster searching
 	 * Keywords are in order of frequency of occurence (descending)
@@ -132,6 +156,7 @@ class WurflConstants{
 		'j2me',
 		'wap2.',
 		'up.link',
+		' arm;',
 		'windows ce',
 		'vodafone',
 		'ucweb',
@@ -147,6 +172,8 @@ class WurflConstants{
 		'adr-',
 		// Required for HPM Safari
 		'htc',
+		// Used to keep Xbox away from the desktop matchers
+		'; xbox',
 		'nintendo',
 		// These keywords keep IE-like mobile UAs out of the MSIE bucket
 		// ex: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; XBLWP7;  ZuneWP7) 
@@ -158,7 +185,7 @@ class WurflConstants{
 		' gt-',
 		'ventana',
 	);
-	
+
 	public static $SMARTTV_BROWSERS = array(
 		'googletv',
 		'boxee',
@@ -172,11 +199,14 @@ class WurflConstants{
 		'inettvbrowser',
 		'opera tv',
 		'viera',
+		'konfabulator',
+		'sony bravia',
+		'crkey',
 	);
 
 	/**
-     * @var array Keywords found in desktop browsers
-     */
+	 * @var array Keywords found in desktop browsers
+	 */
 	public static $DESKTOP_BROWSERS = array(
 		'wow64',
 		'.net clr',
@@ -187,11 +217,14 @@ class WurflConstants{
 		'funwebproducts',
 		'aol 9.',
 		'gtb8',
+		'iceweasel',
+		'epiphany',
 	);
-    /**
-     * @var array Keywords found in robots / crawlers
-     */
+	/**
+	 * @var array Keywords found in robots / crawlers
+	 */
 	public static $ROBOTS = array(
+		'+http',
 		'bot',
 		'crawler',
 		'spider',

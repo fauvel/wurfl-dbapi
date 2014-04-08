@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,38 @@ class KindleUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
+		// Mobile-mode Kindle Fire
+		if ($this->userAgent->contains('Android')) {
+			$model = AndroidUserAgentMatcher::getAndroidModel($this->userAgent, false);
+			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
+			if ($model !== null && $version !== null) {
+				$prefix = $version.' '.$model.WurflConstants::RIS_DELIMITER;
+				$this->userAgent->set($prefix.$this->userAgent);
+				return $this->risMatch(strlen($prefix));
+			} else {
+				
+				$search = 'Silk/';
+				$idx = strpos($this->userAgent, $search);
+				if ($idx !== false) {
+					// The model will be null for Kindle Fire 1st Gen Silk in mobile mode:
+					// Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; Silk/1.0.13.328_10008910) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 Silk-Accelerated=true
+					
+					// Currently, only the original Kindle Fire in Mobile Mode sends an Android UA with the Silk keyword and without model information
+					$tolerance = $idx + strlen($search) + 1;
+					return $this->risMatch($tolerance);
+				}
+			}
+		}
+		
+		// Desktop-mode Kindle Fire
+		// Kindle Fire 2nd Gen Desktop Mode has no android version (even though "Build/I...." tells us it's ICS):
+		// Mozilla/5.0 (Linux; U; en-us; KFOT Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Silk/2.0 Safari/535.19 Silk-Accelerated=false
+		$idx = strpos($this->userAgent, 'Build/');
+		if ($idx !== false) {
+			return $this->risMatch($idx);
+		}
+		
+		// Kindle e-reader
 		$search = 'Kindle/';
 		$idx = strpos($this->userAgent, $search);
 		if ($idx !== false) {
@@ -49,31 +81,28 @@ class KindleUserAgentMatcher extends UserAgentMatcher {
 				return $this->risMatch($tolerance);
 			}
 		}
-		if ($this->userAgent->contains('Android') && $this->userAgent->contains('Kindle Fire')) {
-			$model = AndroidUserAgentMatcher::getAndroidModel($this->userAgent, false);
-			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
-			if ($model !== null && $version !== null) {
-				$prefix = $version.' '.$model.WurflConstants::RIS_DELIMITER;
-				$this->userAgent->set($prefix.$this->userAgent);
-				return $this->risMatch(strlen($prefix));
-			}
-		}
 		
-/* TESTING - DO NOT PORT */
-		$idx = strpos($this->userAgent, 'PlayStation');
+		// PlayStation Vita
+		$search = 'PlayStation Vita';
+		$idx = strpos($this->userAgent, $search);
 		if ($idx !== false) {
-			return $this->risMatch($this->userAgent->indexOfOrLength('.', $idx));
+			return $this->risMatch($idx + strlen($search) + 1);
 		}
-/* END TESTING */
 		
 		return WurflConstants::NO_MATCH;
 	}
 	
 	public function applyRecoveryMatch() {
-		if ($this->userAgent->contains('Kindle/1')) return 'amazon_kindle_ver1';
-		if ($this->userAgent->contains('Kindle/2')) return 'amazon_kindle2_ver1';
-		if ($this->userAgent->contains('Kindle/3')) return 'amazon_kindle3_ver1';
-		if ($this->userAgent->contains(array('Kindle Fire', 'Silk'))) return 'amazon_kindle_fire_ver1';
+		$map = array(
+			'Kindle/1' => 'amazon_kindle_ver1',
+			'Kindle/2' => 'amazon_kindle2_ver1',
+			'Kindle/3' => 'amazon_kindle3_ver1',
+			'Kindle Fire' => 'amazon_kindle_fire_ver1',
+			'Silk' => 'amazon_kindle_fire_ver1',
+		);
+		foreach ($map as $keyword => $id) {
+			if ($this->userAgent->contains($keyword)) return $id;
+		}
 		return 'generic_amazon_kindle';
 	}
 }

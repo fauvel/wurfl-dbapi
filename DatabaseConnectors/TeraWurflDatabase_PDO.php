@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -91,7 +91,8 @@ class TeraWurflDatabase_PDO extends TeraWurflDatabase {
 	}
 	public function getFullDeviceList($tablename){
 		$this->numQueries++;
-		$stmt = $this->dbcon->prepare('SELECT `deviceID`, `user_agent` FROM `'.$tablename.'` WHERE `match` = 1');
+		//$stmt = $this->dbcon->prepare('SELECT `deviceID`, `user_agent` FROM `'.$tablename.'` WHERE `match` = 1');
+		$stmt = $this->dbcon->prepare("SELECT `deviceID`, `user_agent` FROM `$tablename`");
 		$stmt->execute();
 		$data = array();
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
@@ -113,7 +114,7 @@ class TeraWurflDatabase_PDO extends TeraWurflDatabase {
 		return ($row === false)? false: $row['deviceID'];
 	}
 	// RIS == Reduction in String (reduce string one char at a time)
-	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher &$matcher){
+	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher $matcher){
 		$this->numQueries++;
 		$stmt = $this->dbcon->prepare('CALL '.TeraWurflConfig::$TABLE_PREFIX.'_RIS(?, ?, ?)');
 		if(!$stmt->execute(array($userAgent, $tolerance, $matcher->tableSuffix()))){
@@ -126,7 +127,7 @@ class TeraWurflDatabase_PDO extends TeraWurflDatabase {
 		return ($wurflid == 'NULL' || is_null($wurflid))? WurflConstants::NO_MATCH: $wurflid;
 	}
 	// LD == Levesthein Distance
-	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher &$matcher){
+	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher $matcher){
 		throw new Exception("Error: this function (LD) is not yet implemented in MySQL");
 	}
 	public function getDeviceFallBackTree($wurflID){
@@ -201,7 +202,7 @@ ORDER BY parent.`rt`",
 				$this->dbcon->query("INSERT INTO `".TeraWurflConfig::$TABLE_PREFIX.'Index'."` (`deviceID`,`matcher`) VALUE (".$this->SQLPrep($device['id']).",".$this->SQLPrep($matcher).")");
 				// convert device root to tinyint format (0|1) for db
 				if(strlen($device['user_agent']) > 255){
-					$insert_errors[] = "Warning: user agent too long: \"".($device['id']).'"';
+					$device['user_agent'] = substr($device['user_agent'], 0, 255);
 				}
 				$insertcache[] = sprintf("(%s,%s,%s,%s,%s,%s)",
 					$this->SQLPrep($device['id']),

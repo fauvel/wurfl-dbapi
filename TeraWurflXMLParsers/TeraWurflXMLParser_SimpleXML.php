@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,11 +22,12 @@
 class TeraWurflXMLParser_SimpleXML extends TeraWurflXMLParser {
 
 	public function __construct(){
-		if(function_exists('simplexml_load_file')){
+		if (function_exists('simplexml_load_file')) {
 			$this->parser_type = self::$PARSER_SIMPLEXML;
-		}else{
+		} else {
 			throw new Exception("Cannot load SimpleXML");
 		}
+		parent::__construct();
 	}
 	
 	public function open($filename,$file_type){
@@ -83,7 +84,7 @@ class TeraWurflXMLParser_SimpleXML extends TeraWurflXMLParser {
 	protected function loadDeviceXMLToArray(&$device){
 		$id = (string)$device['id'];
 		$this->devices[$id] = array('id'=>$id);
-		$filtering = (TeraWurflConfig::$CAPABILITY_FILTER)? true:false;
+		$filtering = ($this->capability_filter)? true: false;
 		$includegroup = false;
 		if(isset($device['fall_back'])) $this->devices[$id]['fall_back'] = (string)$device['fall_back'];
 		if(isset($device['user_agent'])) $this->devices[$id]['user_agent'] = TeraWurflUserAgent::cleanUserAgent((string)$device['user_agent']);

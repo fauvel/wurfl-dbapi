@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,63 +24,58 @@ class MSIEUserAgentMatcher extends UserAgentMatcher {
 	public $runtime_normalization = true;
 	
 	public static $constantIDs = array(
-		'msie',
-		'msie_4',
-		'msie_5',
-		'msie_5_5',
-		'msie_6',
-		'msie_7',
-		'msie_8',
-		'msie_9',
-		'msie_10',
+		0     => 'msie',
+		4     => 'msie_4',
+		5     => 'msie_5',
+		'5.5' => 'msie_5_5',
+		6     => 'msie_6',
+		7     => 'msie_7',
+		8     => 'msie_8',
+		9     => 'msie_9',
+		10    => 'msie_10',
+		11    => 'msie_11',
 	);
 	
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-		if ($httpRequest->isMobileBrowser()) return false;
-		return ($httpRequest->user_agent->startsWith('Mozilla') && $httpRequest->user_agent->contains('MSIE')
-				&& !$httpRequest->user_agent->contains(array('Opera', 'armv', 'MOTO', 'BREW')));
+		if ($httpRequest->isMobileBrowser()
+				|| !$httpRequest->user_agent->startsWith('Mozilla')
+				|| $httpRequest->user_agent->contains(array('Opera', 'armv', 'MOTO', 'BREW'))
+			) {
+			return false;
+		}
+		
+		// IE 11 signature
+		$has_trident_rv = ($httpRequest->user_agent->contains('Trident') && $httpRequest->user_agent->contains('rv:'));
+		// IE < 11 signature
+		$has_msie = $httpRequest->user_agent->contains('MSIE');
+		return ($has_msie || $has_trident_rv);
 	}
 	
 	public function applyConclusiveMatch() {
 		$matches = array();
-		if(preg_match('/^Mozilla\/[45]\.0 \(compatible; MSIE (\d+)\.(\d+);/', $this->userAgent, $matches)){
-			if(TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE){
-				return WurflConstants::GENERIC_WEB_BROWSER;
+		if (preg_match('/^Mozilla\/5\.0 \(.+?Trident.+?; rv:(\d\d)\.(\d+)\)/', $this->userAgent, $matches)
+			|| preg_match('/^Mozilla\/[45]\.0 \(compatible; MSIE (\d+)\.(\d+);/', $this->userAgent, $matches)) {
+			
+			$major = (int)$matches[1];
+			$minor = (int)$matches[2];
+			
+			// MSIE 5.5 is handled specifically
+			if ($major == 5 && $minor == 5) {
+				return 'msie_5_5';
 			}
-			switch((int)$matches[1]){
-				// cases are intentionally out of sequence for performance
-				case 10:
-					return 'msie_10';
-					break;
-				case 9:
-					return 'msie_9';
-					break;
-				case 8:
-					return 'msie_8';
-					break;
-				case 7:
-					return 'msie_7';
-					break;
-				case 6:
-					return 'msie_6';
-					break;
-				case 4:
-					return 'msie_4';
-					break;
-				case 5:
-					return ($matches[2]==5)? 'msie_5_5': 'msie_5';
-					break;
-				default:
-					return 'msie';
-					break;
+			
+			// Look for version in constant ID array
+			if (array_key_exists($major, self::$constantIDs)) {
+				return self::$constantIDs[$major];
 			}
 		}
 		$this->userAgent->set(preg_replace('/( \.NET CLR [\d\.]+;?| Media Center PC [\d\.]+;?| OfficeLive[a-zA-Z0-9\.\d]+;?| InfoPath[\.\d]+;?)/', '', $this->userAgent));
-		return $this->risMatch($this->userAgent->firstSlash());
+		return $this->risMatch($this->userAgent->indexOfOrLength('Trident'));
 	}
-	public function applyRecoveryMatch(){
-		if($this->userAgent->contains(array(
+	
+	public function applyRecoveryMatch() {
+		if ($this->userAgent->contains(array(
 			'SLCC1',
 			'Media Center PC',
 			'.NET CLR',

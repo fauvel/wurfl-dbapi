@@ -11,15 +11,15 @@ require_once realpath(dirname(__FILE__).'/../../TeraWurflRemoteClient.php');
 // NOTE: You must use $FORMAT_XML to communicate with Tera-WURFL 2.1.1 and earlier!
 $data_format = TeraWurflRemoteClient::$FORMAT_JSON;
 $wurflObj = new TeraWurflRemoteClient('http://localhost/Tera-Wurfl/webservice.php',$data_format);
-$capabilities = array("product_info","fake_capability");
-$wurflObj->getCapabilitiesFromAgent(null,$capabilities);
+$capabilities = array("is_wireless_device","model_name", "brand_name", "ux_full_desktop", "fake_capability");
+$ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; HTC; Windows Phone 8X by HTC)';
+$wurflObj->getCapabilitiesFromAgent($ua,$capabilities);
 $time = round(microtime(true)-$start,6);
-echo "<h3>Response from Tera-WURFL ".$wurflObj->getAPIVersion()."</h3>";
+echo "<h3>Response from WURFL API ".$wurflObj->getAPIVersion()."</h3>";
 echo "<pre>".var_export($wurflObj->capabilities,true)."</pre>";
 if($wurflObj->errors){
-	foreach($wurflObj->errors as $name => $error){
-		echo "$name: $error<br/>";
-	}
+	echo "<h3>Errors</h3>";
+	echo "<pre>".var_export($wurflObj->errors,true)."</pre>";
 }
 echo "<hr/>Total Time: $time";
 ?>

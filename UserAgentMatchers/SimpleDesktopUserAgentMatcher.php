@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -34,7 +34,7 @@ class SimpleDesktopUserAgentMatcher extends UserAgentMatcher {
 	 * @param TeraWurflHttpRequest $httpRequest
 	 * @return bool
 	 */
-	public static function isDesktopBrowserHeavyDutyAnalysis(TeraWurflHttpRequest $httpRequest){
+	public static function isDesktopBrowserHeavyDutyAnalysis(TeraWurflHttpRequest $httpRequest) {
 		$user_agent = $httpRequest->user_agent;
 		// Check UAProf
 		if ($httpRequest->uaprof instanceof TeraWurflUserAgentProfile && $httpRequest->uaprof->containsValidUrl()) return false;
@@ -54,8 +54,10 @@ class SimpleDesktopUserAgentMatcher extends UserAgentMatcher {
 		// Check desktop keywords
 		if ($user_agent->iContains(WurflConstants::$DESKTOP_BROWSERS)) return true;
 		if ($user_agent->regexContains(array(
+			// Internet Explorer 11
+			'/^Mozilla\/5\.0 \(Windows NT.+?Trident.+?; rv:\d\d\.\d+\)/',
 			// Internet Explorer 9
-			'/^Mozilla\/5\.0 \(compatible; MSIE 9\.0; Windows NT \d\.\d/',
+			'/^Mozilla\/5\.0 \(compatible; MSIE (9|10)\.0; Windows NT \d\.\d/',
 			// Internet Explorer <9
 			'/^Mozilla\/4\.0 \(compatible; MSIE \d\.\d; Windows NT \d\.\d/',
 		))) return true;

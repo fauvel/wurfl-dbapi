@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -191,6 +191,35 @@ class TeraWurflLoader{
 	public function validate(){
 		$this->timevalidate = microtime(true);
 		$before_errors = count($this->errors);
+				
+		
+		// Check that required devices are present
+		$required_devs = UserAgentMatcher::getRequiredDeviceIDs();
+		$required_devs[] = 'generic';
+		foreach ($required_devs as $id) {
+			if (!array_key_exists($id, $this->devices)) {
+				$message = "Missing required WURFL Device!: $id";
+				$this->wurfl->toLog($message, LOG_ERR);
+				$this->errors[] = $message;
+			}
+		}
+		
+		// Check that required capabilities are present
+		$loaded_caps = array();
+		foreach ($this->devices['generic'] as $name => $group) {
+			if (!is_array($group)) continue;
+			$loaded_caps = array_merge($loaded_caps, array_keys($group));
+		}
+		
+		$required_caps = VirtualCapabilityProvider::getRequiredCapabilities();
+		$missing_caps = array_diff($required_caps, $loaded_caps);
+		
+		if (count($missing_caps) > 0) {
+			$message = "Missing required WURFL Capabilities!:\n".implode(', ', $missing_caps);
+			$this->wurfl->toLog($message, LOG_ERR);
+			$this->errors[] = $message;
+		}
+		
 		foreach($this->devices as $id => &$device){
 			if(!$id == "generic"){
 				// Must have a valid wurfl ID
@@ -213,6 +242,7 @@ class TeraWurflLoader{
 				}
 			}
 		}
+		
 		return ($before_errors == count($this->errors));
 	}
 	/**
@@ -259,6 +289,9 @@ class TeraWurflLoader{
 		// Explode the patchfile string into an array of patch files (normally just one file)
 		$patches = explode(';',TeraWurflConfig::$PATCH_FILE);
 		foreach($patches as $patch){
+			if (trim($patch) == '') {
+				continue;
+			}
 			$patch_devices = array();
 			$this->wurfl->toLog("Loading patch: ".$patch,LOG_WARNING);
 			$patch_parser = TeraWurflXMLParser::getInstance();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -84,7 +84,7 @@ abstract class UserAgentMatcher {
      * Updates the deviceList Array to contain all the WURFL IDs that are related to the current UserAgentMatcher
      */
     protected function updateDeviceList() {
-    	if(is_array($this->deviceList) && count($this->deviceList)>0) return;
+    	if (is_array($this->deviceList) && count($this->deviceList)>0) return;
     	$this->deviceList = $this->wurfl->db->getFullDeviceList($this->wurfl->fullTableName());
     }
     /**
@@ -131,15 +131,27 @@ abstract class UserAgentMatcher {
      * Returns the name of the UserAgentMatcher in use
      * @return string UserAgentMatcher name
      */
-    public function matcherName(){
+    public function matcherName() {
     	return get_class($this);
     }
     /**
      * Returns the database table suffix for the current UserAgentMatcher
      * @return string Table suffix
      */
-    public function tableSuffix(){
+    public function tableSuffix() {
     	$cname = $this->matcherName();
     	return substr($cname, 0, strpos($cname, 'UserAgentMatcher'));
+    }
+    
+    public static function getRequiredDeviceIDs() {
+    	$ids = array();
+    	foreach(WurflConstants::$matchers as $matcher) {
+    		$matcherClass = $matcher."UserAgentMatcher";
+    		$file = dirname(__FILE__)."/{$matcherClass}.php";
+    		require_once($file);
+    		$properties = get_class_vars($matcherClass);
+    		$ids = array_merge($ids,$properties['constantIDs']);
+    	}
+    	return array_unique($ids);
     }
 }

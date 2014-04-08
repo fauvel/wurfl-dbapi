@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -44,7 +44,7 @@ class WebOSUserAgentMatcher extends UserAgentMatcher {
 		return WurflConstants::NO_MATCH;
 	}
 	
-	public function applyRecoveryMatch(){
+	public function applyRecoveryMatch() {
 		return $this->userAgent->contains('hpwOS/3')? 'hp_tablet_webos_generic': 'hp_webos_generic';
 	}
 	

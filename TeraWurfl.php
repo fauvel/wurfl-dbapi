@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -40,6 +40,7 @@ require_once realpath(dirname(__FILE__).'/UserAgentMatchers/UserAgentMatcher.php
 require_once realpath(dirname(__FILE__).'/HttpHeaderNormalizers/IHttpHeaderNormalizer.php');
 require_once realpath(dirname(__FILE__).'/HttpHeaderNormalizers/GenericUserAgentNormalizer.php');
 require_once realpath(dirname(__FILE__).'/TeraWurflHttpRequest/TeraWurflHttpRequest.php');
+require_once realpath(dirname(__FILE__).'/VirtualCapability/VirtualCapabilityProvider.php');
 /**#@-*/
 /**
  * The main Tera-WURFL Class, provides all end-user methods and properties for interacting
@@ -68,6 +69,11 @@ class TeraWurfl{
 	 * @var Array
 	 */
 	public $capabilities;
+	/**
+	 * Flattened version of the capabilities for high-speed access
+	 * @var Array
+	 */
+	protected $flat_capabilities;
 	/**
 	 * Database connector to be used, must extend TeraWurflDatabase.  All database functions are performed
 	 * in the database connector through its methods and properties.
@@ -106,13 +112,13 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.4.2.0";
-	public $historical_release_version = "2.1.9";
+	public $release_version = "1.5.1.0";
+	public $historical_release_version = "2.2.2";
 	/**
 	 * The required version of PHP for this release
 	 * @var string
 	 */
-	public static $required_php_version = "5.0.0";
+	public static $required_php_version = "5.1.0";
 	
 	/**
 	 * Lookup start time
@@ -148,11 +154,17 @@ class TeraWurfl{
 	protected $maxDeviceDepth = 40;
 	
 	/**
+	 * @var VirtualCapabilityProvider
+	 */
+	public $virtual_cap_provider;
+	
+	/**
      * Instatiate a new TeraWurfl object
      */
 	public function __construct() {
 		$this->errors = array();
 		$this->capabilities = array();
+		$this->flat_capabilities = array();
 		$this->matcherHistory = array();
 		$this->rootdir = dirname(__FILE__).'/';
 		$dbconnector = 'TeraWurflDatabase_'.TeraWurflConfig::$DB_CONNECTOR;
@@ -160,7 +172,6 @@ class TeraWurfl{
 		if (!$this->db->connect()) {
 			throw new TeraWurflDatabaseException("Cannot connect to database: ".$this->db->getLastError());
 		}
-
 	}
 	
 	/**
@@ -197,6 +208,7 @@ class TeraWurfl{
 		$this->lookup_start = microtime(true);
 		$this->foundInCache = false;
 		$this->capabilities = array();
+		$this->flat_capabilities = array();
 		// Use the ultra high performance SimpleDesktopMatcher if enabled
 		if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE) {
 			require_once realpath(dirname(__FILE__).'/UserAgentMatchers/SimpleDesktopUserAgentMatcher.php');
@@ -214,6 +226,7 @@ class TeraWurfl{
 				$deviceID = $cacheData['id'];
 			}
 		}
+		$this->virtual_cap_provider = new VirtualCapabilityProvider($this);
 		if (!$this->foundInCache) {
 			require_once realpath(dirname(__FILE__).'/UserAgentMatchers/SimpleDesktopUserAgentMatcher.php');
 			// Find appropriate user agent matcher
@@ -233,6 +246,7 @@ class TeraWurfl{
 			// Since this device was not cached, cache it now.
 			$this->db->saveDeviceInCache($this->httpRequest->user_agent->cleaned, $this->capabilities);
 		}
+		$this->flattenCapabilities();
 		return $this->capabilities[$this->matchDataKey]['match'];
 	}
 	/**
@@ -240,6 +254,11 @@ class TeraWurfl{
 	 * @param string $deviceID WURFL ID
 	 */
 	public function getFullCapabilities($deviceID) {
+		$this->capabilities = array();
+		$this->flat_capabilities = null;
+		if ($this->virtual_cap_provider === null) {
+			$this->virtual_cap_provider = new VirtualCapabilityProvider($this);
+		}
 		if (is_null($deviceID)) {
 			$matcher = $this->userAgentMatcher? get_class($this->userAgentMatcher): '[none]';
 			throw new Exception("Invalid Device ID: ".var_export($deviceID, true)."\nMatcher: $matcher\nUser Agent: ".$this->httpRequest->user_agent);
@@ -329,20 +348,25 @@ class TeraWurfl{
 	 * @return integer|string|boolean|null Capability value
 	 */
 	public function getDeviceCapability($capability) {
-		// TODO: Optimize function, one method is to flatten the capabilities array, or create a group=>cap index
-		foreach ( $this->capabilities as $group ) {
-			if ( !is_array($group) ) {
-				continue;
+		if ($this->flat_capabilities === null) $this->flattenCapabilities();
+		if (!array_key_exists($capability, $this->flat_capabilities)) {
+			if ($this->virtual_cap_provider->exists($capability)) {
+				// This is a virtual capability, not a real one
+				return $this->virtual_cap_provider->get($capability);
 			}
-			while ( list($key, $value)=each($group) ) {
-				if ($key==$capability) {
-					return $value;
-				}
-			}
+			$this->toLog('I could not find the requested capability ('.$capability.'), returning NULL', LOG_WARNING);
+			return null;
 		}
-		$this->toLog('I could not find the requested capability ('.$capability.'), returning NULL', LOG_WARNING);
-		// since 1.5.2, I can't return "false" because that is a valid value.  Now I return NULL, use is_null() to check
-		return null;
+		return $this->flat_capabilities[$capability];
+	}
+	/**
+	 * Gets an array of all the available capability names, not including virtual capabilities.
+	 * Only available after looking up at least one device
+	 * @return array
+	 */
+	public function getLoadedCapabilityNames() {
+		if ($this->flat_capabilities === null) $this->flattenCapabilities();
+		return array_keys($this->flat_capabilities);
 	}
 	/**
 	 * Returns the value of the given setting name
@@ -359,6 +383,43 @@ class TeraWurfl{
 	public function fullTableName() {
 		return TeraWurflConfig::$TABLE_PREFIX.'_'.$this->userAgentMatcher->tableSuffix();
 	}
+	
+	/**
+	 * Prints the contents of the API's UserAgentMatcher buckets
+	 */
+	public function dumpBuckets() {
+		require_once dirname(__FILE__).'/TeraWurflUtils/TeraWurflIdMap.php';
+		$map = new TeraWurflIdMap();
+		if (!($this->httpRequest instanceof TeraWurflHttpRequest)) {
+			$this->httpRequest = new TeraWurflHttpRequest(array('HTTP_USER_AGENT' => 'debug'));
+		}
+		
+		// Setup WurflNodes
+		$wurfl_file = $this->rootdir.TeraWurflConfig::$DATADIR.TeraWurflConfig::$WURFL_FILE;
+		$map->load($wurfl_file);
+		
+		UserAgentMatcherFactory::loadMatchers();
+		$matchers = WurflConstants::$matchers;
+		sort($matchers);
+		foreach ($matchers as $matcher_name) {
+			$matcher_class_name = $matcher_name.'UserAgentMatcher';
+			/* @var $matcher UserAgentMatcher */
+			$matcher = new $matcher_class_name($this);
+			$bucket = $matcher->tableSuffix();
+			$bucket_data = $this->db->getFullDeviceList(TeraWurflConfig::$TABLE_PREFIX.'_'.$bucket);
+			ksort($bucket_data);
+			foreach ($bucket_data as $device_id => $user_agent) {
+				$original_ua = $map->$device_id;
+				echo implode("\t", array(
+						$bucket,
+						$device_id,
+						$user_agent,
+						$original_ua,
+				))."\n";
+			}
+		}
+	}
+	
 	/**
 	 * Log an error in the Tera-WURFL log file
 	 * @see TeraWurflConfig
@@ -547,11 +608,55 @@ class TeraWurfl{
 			}
 		}
 	}
+	
+	/**
+	 * Returns the value of the requested capability for the detected device
+	 * @param string $capability Capability name (e.g. "is_wireless_device")
+	 * @return integer|string|boolean|null Capability value
+	 * @throws TeraWurflInvalidCapabilityException Invalid virtual capability
+	 * @see VirtualCapability::get()
+	 */
+	public function getVirtualCapability($capability) {
+		if (!$this->virtual_cap_provider->exists($capability)) {
+			throw new TeraWurflInvalidCapabilityException("The virtual capability $capability does not exist");
+		}
+		return $this->virtual_cap_provider->get($capability);
+	}
+	
+	/**
+	 * Gets an array of all the virtual capabilities
+	 * @return array Virtual capabilities in format "name => value"
+	 * @see VirtualCapability::getAll()
+	 */
+	public function getAllVirtualCapabilities() {
+		return $this->virtual_cap_provider->getAll();
+	}
+	
+	public function __get($capability) {
+		return $this->getDeviceCapability($capability);
+	}
+	
 	/**
 	 * Get the absolute path to the data directory on the filesystem
 	 * @return string Absolute path to data directory
 	 */
 	public static function absoluteDataDir() {
 		return dirname(__FILE__).'/'.TeraWurflConfig::$DATADIR;
+	}
+	
+	/**
+	 * Flattens the capabilities array for fast access
+	 */
+	public function flattenCapabilities() {
+		$this->flat_capabilities = array();
+		foreach ($this->capabilities as $group_name => $group) {
+			if (is_array($group)) {
+				foreach ($group as $cap_name => $cap) {
+					$this->flat_capabilities[$cap_name] = $cap;
+				}
+			} else {
+				$this->flat_capabilities[$group_name] = $group;
+			}
+		}
 	}
 }

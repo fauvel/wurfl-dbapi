@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -66,6 +66,7 @@ class TeraWurflRemoteClient {
 	public static $userAgentHeaders = array(
 		'HTTP_X_DEVICE_USER_AGENT',
 		'HTTP_X_ORIGINAL_USER_AGENT',
+		'HTTP_DEVICE_STOCK_UA',
 		'HTTP_X_OPERAMINI_PHONE_UA',
 		'HTTP_X_SKYFIRE_PHONE',
 		'HTTP_X_BOLT_PHONE_UA',
@@ -76,7 +77,7 @@ class TeraWurflRemoteClient {
 	protected $webserviceUrl;
 	protected $xml;
 	protected $json;
-	protected $clientVersion = '2.1.4';
+	protected $clientVersion = '3.0';
 	protected $apiVersion;
 	protected $loadedDate;
 	protected $timeout;
@@ -93,9 +94,6 @@ class TeraWurflRemoteClient {
 	 */
 	public function __construct($TeraWurflWebserviceURL,$data_format='json',$timeout=1,$method='urlwrap'){
 		$this->format = $data_format;
-		if(!self::validURL($TeraWurflWebserviceURL)){
-			throw new Exception("TeraWurflRemoteClient Error: the specified webservice URL is invalid.  Please make sure you pass the full url to Tera-WURFL's webservice.php.");
-		}
 		$this->capabilities = array();
 		$this->errors = array();
 		$this->webserviceUrl = $TeraWurflWebserviceURL;
@@ -115,7 +113,7 @@ class TeraWurflRemoteClient {
 		. 'ua=' . urlencode($this->userAgent)
 		. '&format=' . $this->format
 		. '&search=' . implode('|',$capabilities);
-		$this->callTeraWurfl($uri);
+		$this->callTeraWurfl($uri, $this->userAgent);
 		$this->loadCapabilities();
 		$this->loadErrors();
 		return true;
@@ -173,17 +171,18 @@ class TeraWurflRemoteClient {
 	/**
 	 * Make the webservice call to the server using the GET method and load the response.
 	 * @param String $uri The URI of the master server's webservice.php
+	 * @param String $userAgent The user agent that will be inspected
 	 * @return void
 	 */
-	protected function callTeraWurfl($uri){
+	protected function callTeraWurfl($uri, $userAgent){
 		try{
 			// Load raw data
 			switch($this->method){
 				case self::$METHOD_URL_WRAPPER:
-					$return_data = $this->loadURL_URLWrapper($uri);
+					$return_data = $this->loadURL_URLWrapper($uri, $userAgent);
 					break;
 				case self::$METHOD_CURL:
-					$return_data = $this->loadURL_cURL($uri);
+					$return_data = $this->loadURL_cURL($uri, $userAgent);
 					break;
 				default:
 					throw new Exception("Invalid HTTP Method specified: ".$this->method);
@@ -216,10 +215,10 @@ class TeraWurflRemoteClient {
 	 * @param String $uri URL
      * @return string data
 	 */
-	protected function loadURL_URLWrapper($uri){
+	protected function loadURL_URLWrapper($uri, $userAgent){
 		$context_options = array(
 			'http' => array(
-				'user_agent' => 'Tera-WURFL/RemoteClient v'.$this->clientVersion,
+				'user_agent' => $userAgent,
 			)
 		);
 		if(version_compare(PHP_VERSION, '5.2.1', '>=')){
@@ -233,12 +232,12 @@ class TeraWurflRemoteClient {
 	 * @param String $uri URL
      * @return string
 	 */
-	protected function loadURL_cURL($uri){
+	protected function loadURL_cURL($uri, $userAgent){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $uri);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Tera-WURFL/RemoteClient v'.$this->clientVersion);
+		curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$return_data = curl_exec($ch);
 		curl_close($ch);
@@ -272,9 +271,14 @@ class TeraWurflRemoteClient {
 	 * @return void
 	 */
 	protected function loadErrors(){
+		$this->errors = array();
 		switch($this->format){
 			case self::$FORMAT_JSON:
-				$this->errors &= $this->json['errors'];
+				if (isset($this->json['errors']) && is_array($this->json['errors'])) {
+					foreach ($this->json['errors'] as $error) {
+						$this->errors[$error['name']] = $error['desc'];
+					}
+				};
 				break;
 			default:
 			case self::$FORMAT_XML:

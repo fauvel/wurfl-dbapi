@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,10 +23,12 @@ class OperaMiniUserAgentMatcher extends UserAgentMatcher {
 	
 	public static $constantIDs = array(
 		'Opera Mini/1' => 'generic_opera_mini_version1',
-        'Opera Mini/2' => 'generic_opera_mini_version2',
-        'Opera Mini/3' => 'generic_opera_mini_version3',
-        'Opera Mini/4' => 'generic_opera_mini_version4',
-        'Opera Mini/5' => 'generic_opera_mini_version5',
+		'Opera Mini/2' => 'generic_opera_mini_version2',
+		'Opera Mini/3' => 'generic_opera_mini_version3',
+		'Opera Mini/4' => 'generic_opera_mini_version4',
+		'Opera Mini/5' => 'generic_opera_mini_version5',
+		'Opera Mini/6' => 'generic_opera_mini_version6',
+		'Opera Mini/7' => 'generic_opera_mini_version7',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -35,9 +37,19 @@ class OperaMiniUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
+		$opera_mini_idx = $this->userAgent->indexOf('Opera Mini');
+		if ($opera_mini_idx !== false) {
+			// Match up to the first '.' after 'Opera Mini'
+			$tolerance = $this->userAgent->indexOf('.', $opera_mini_idx);
+			if ($tolerance !== false) {
+				// +1 to match just after the '.'
+				return $this->risMatch($tolerance + 1);
+			}
+		}
 		return $this->risMatch($this->userAgent->firstSlash());
 	}
-	public function applyRecoveryMatch(){
+	
+	public function applyRecoveryMatch() {
 		foreach (self::$constantIDs as $keyword => $device_id) {
 			if ($this->userAgent->contains($keyword)) {
 				return $device_id;

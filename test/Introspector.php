@@ -48,7 +48,7 @@ class ScientiaMobileIntrospector_Controller {
 	
 	protected function sendFailure($message) {
 		$this->response['success'] = false;
-		$this->response['message'] = $message;
+		$this->response['error_message'] = $message;
 		$this->sendResponse();
 	}
 	
@@ -146,6 +146,13 @@ class ScientiaMobileIntrospector_Controller {
 		);
 		$this->response['success'] = true;
 		$this->sendResponse();
+	}
+	
+	protected function actionBucket() {
+		header('Content-Type: text/plain');
+		echo "Database API v{$this->wurfl->release_version}; ".$this->wurfl->getSetting(TeraWurfl::$SETTING_WURFL_VERSION)."\n";
+		$this->wurfl->dumpBuckets();
+		exit;
 	}
 	
 	protected function actionForm() {
