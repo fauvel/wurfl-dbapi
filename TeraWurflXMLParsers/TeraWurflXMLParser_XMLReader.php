@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,18 +19,19 @@
  * Loads the wurfl.xml file using the stream-based XMLReader class
  * @package TeraWurflXMLParser
  */
-class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser{
+class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser {
 	
 	public function __construct(){
-		if(class_exists('XMLReader')){
+		if (class_exists('XMLReader')) {
 			$this->parser_type = self::$PARSER_XMLREADER;
-		}else{
+		} else {
 			throw new Exception("Cannot load XMLReader");
 		}
 		$this->xml = new XMLReader();
+		parent::__construct();
 	}
 	
-	public function open($filename,$file_type){
+	public function open($filename, $file_type){
 		$this->file_type = $file_type;
 		$this->xml->open($filename);
 		//TODO: add error handling
@@ -54,7 +55,7 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser{
 				case XMLReader::END_ELEMENT:
 				default:
 					break;
-			} 
+			}
 		}
 	}
 	protected function getValue(){
@@ -72,7 +73,7 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser{
 		if($this->xml->getAttribute('actual_device_root')) $device['actual_device_root'] = ($this->xml->getAttribute('actual_device_root')=="true")?1:0;
 		$groupdevice = '';
 		$groupname = '';
-		$filtering = (TeraWurflConfig::$CAPABILITY_FILTER)? true:false;
+		$filtering = ($this->capability_filter)? true:false;
 		$includegroup = false;
 		while($this->xml->read()){
 			if($this->xml->nodeType != XMLReader::ELEMENT) continue;
@@ -105,7 +106,7 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser{
 						continue;
 					}
 					if($filtering && !$includegroup && $this->enabled($this->xml->getAttribute('name'))){
-						// the groupdevice array might already exists
+						// the groupdevice array might already exist
 						if(!array_key_exists($groupname,$device)) $device[$groupname] = array();
 						$device[$groupname][$this->xml->getAttribute('name')] = self::cleanValue($this->xml->getAttribute('value'));
 						continue;

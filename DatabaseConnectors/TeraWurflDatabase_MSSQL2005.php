@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -94,7 +94,7 @@ class TeraWurflDatabase_MSSQL2005 extends TeraWurflDatabase{
 		return $data['deviceID'];
 	}
 	// RIS == Reduction in String (reduce string one char at a time)
-	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher &$matcher){
+	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher $matcher){
 		$this->numQueries++;
 		$query = sprintf("EXEC ".TeraWurflConfig::$TABLE_PREFIX."_RIS %s,%s,%s",$this->SQLPrep($userAgent),$tolerance,$this->SQLPrep($matcher->tableSuffix()));
 		$result = sqlsrv_query($this->dbcon,$query);
@@ -107,7 +107,7 @@ class TeraWurflDatabase_MSSQL2005 extends TeraWurflDatabase{
 		return ($wurflid == 'NULL' || is_null($wurflid))? WurflConstants::NO_MATCH: $wurflid;
 	}
 	// TODO: Implement with Stored Proc
-	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher &$matcher){
+	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher $matcher){
 		throw new Exception("Error: this function (LD) is not yet implemented in MS SQL");
 	}
 	
@@ -129,7 +129,7 @@ class TeraWurflDatabase_MSSQL2005 extends TeraWurflDatabase{
 				sqlsrv_query($this->dbcon,"INSERT INTO ".TeraWurflConfig::$TABLE_PREFIX.'Index'." (deviceID,matcher) VALUES (".$this->SQLPrep($device['id']).",".$this->SQLPrep($matcher).")");
 				// convert device root to tinyint format (0|1) for db
 				if(strlen($device['user_agent']) > 255){
-					$insert_errors[] = "Warning: user agent too long: \"".($device['id']).'"';
+					$device['user_agent'] = substr($device['user_agent'], 0, 255);
 				}
 				$insertcache[] = sprintf("SELECT %s,%s,%s,%s,%s \n",
 					$this->SQLPrep($device['id']),

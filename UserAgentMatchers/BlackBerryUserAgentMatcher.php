@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -37,15 +37,20 @@ class BlackBerryUserAgentMatcher extends UserAgentMatcher {
 		'4.' => 'blackberry_generic_ver4',
 		'5.' => 'blackberry_generic_ver5',
 		'6.' => 'blackberry_generic_ver6',
+	
+		'10' => 'blackberry_generic_ver10',
+		'10t' => 'blackberry_generic_ver10_tablet',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return $httpRequest->user_agent->iContains('blackberry');
+		return ($httpRequest->user_agent->iContains('blackberry') || $httpRequest->user_agent->contains('(BB10;'));
 	}
 	
-	public function applyConclusiveMatch(){
-		if ($this->userAgent->startsWith('Mozilla/4')) {
+	public function applyConclusiveMatch() {
+		if ($this->userAgent->contains('BB10')) {
+			$tolerance = $this->userAgent->indexOfOrLength(')');
+		} else if ($this->userAgent->startsWith('Mozilla/4')) {
 			$tolerance = $this->userAgent->secondSlash();
 		} else if ($this->userAgent->startsWith('Mozilla/5')) {
 			$tolerance = $this->userAgent->ordinalIndexOf(';', 3);
@@ -55,9 +60,15 @@ class BlackBerryUserAgentMatcher extends UserAgentMatcher {
 		return $this->risMatch($tolerance);
 	}
 	
-	public function applyRecoveryMatch(){
-		// BlackBerry
-		if (preg_match('#Black[Bb]erry[^/\s]+/(\d.\d)#', $this->userAgent, $matches)) {
+	public function applyRecoveryMatch() {
+		// BlackBerry 10
+		if ($this->userAgent->contains('BB10')) {
+			if ($this->userAgent->contains('Mobile')) {
+				return 'blackberry_generic_ver10';
+			} else {
+				return 'blackberry_generic_ver10_tablet';
+			}
+		} else if (preg_match('#Black[Bb]erry[^/\s]+/(\d.\d)#', $this->userAgent, $matches)) {
 			$version = $matches[1];
 			foreach (self::$constantIDs as $vercode => $deviceID) {
 				if (strpos($version, $vercode) !== false) {

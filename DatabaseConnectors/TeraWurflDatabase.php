@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -123,7 +123,7 @@ abstract class TeraWurflDatabase{
 	 * @param UserAgentMatcher $matcher The UserAgentMatcherInstance that is matching the User Agent
 	 * @return string WURFL ID
 	 */
-	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher &$matcher){}
+	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher $matcher){}
 	/**
 	 * Find the matching Device ID for a given User Agent using LD (Leveshtein Distance)
 	 * @param string $userAgent User Agent
@@ -131,7 +131,7 @@ abstract class TeraWurflDatabase{
 	 * @param UserAgentMatcher $matcher The UserAgentMatcherInstance that is matching the User Agent
 	 * @return string WURFL ID
 	 */
-	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher &$matcher){}
+	public function getDeviceFromUA_LD($userAgent,$tolerance,UserAgentMatcher $matcher){}
 	/**
 	 * Returns the Fallback tree directly from the database.  If this is implemented, you must set
 	 * TeraWurflDatabase::$db_implements_fallback = true for Tera-WURFL to use it.
@@ -294,6 +294,6 @@ abstract class TeraWurflDatabase{
 	 * @return boolean
 	 */
 	public static function isNumericSafe($value) {
-		return (bool)preg_match('/^-?[\d]+([\.\d]+)?$/', $value);
+		return (bool)preg_match('/^-?\d+(\.\d+)?$/', $value);
 	}
 }

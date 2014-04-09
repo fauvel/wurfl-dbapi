@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,7 @@ class NintendoUserAgentMatcher extends UserAgentMatcher {
 		return $this->ldMatch();
 	}
 	
-	public function applyRecoveryMatch(){
+	public function applyRecoveryMatch() {
 		if ($this->userAgent->contains('Nintendo Wii')) return 'nintendo_wii_ver1';
 		if ($this->userAgent->contains('Nintendo DSi')) return 'nintendo_dsi_ver1';
 		if (($this->userAgent->startsWith('Mozilla/') && $this->userAgent->contains('Nitro') && $this->userAgent->contains('Opera'))) {

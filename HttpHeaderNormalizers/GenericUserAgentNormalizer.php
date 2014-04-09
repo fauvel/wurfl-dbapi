@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -35,6 +35,7 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 		$this->normalizeLocale();
 		$this->normalizeBlackberry();
 		$this->normalizeAndroid();
+		$this->normalizeTransferEncoding();
 		//$this->normalizeEncryptionLevel();
 	}
 	
@@ -46,14 +47,13 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 		$this->_user_agent->cleaned = preg_replace('/\[(ST|TF|NT)[\dX]+\]/', 'TFXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', $this->_user_agent->cleaned);
 	}
 	protected function normalizeLocale() {
-		//$this->_user_agent->cleaned = preg_replace('/; [a-z]{2}(?:-[a-zA-Z]{0,2})?(?=[;\)])([ ;\)])/', '; xx-xx$1', $this->_user_agent->cleaned);
-		$this->_user_agent->cleaned = preg_replace('/; ?[a-z]{2}(?:-[a-zA-Z]{2})?(?:\.utf8|\.big5)?\b-?/', '; xx-xx', $this->_user_agent->cleaned);
+		$this->_user_agent->cleaned = preg_replace('/; ?[a-z]{2}(?:-r?[a-zA-Z]{2})?(?:\.utf8|\.big5)?\b-?(?!:)/', '; xx-xx', $this->_user_agent->cleaned);
 	}
 	/**
 	 * Normalizes Android version numbers
 	 */
 	protected function normalizeAndroid() {
-		$this->_user_agent->cleaned = preg_replace('/(Android)[ \-](\d\.\d)([^; \/\)]+)/', '$1 $2', $this->_user_agent->cleaned);
+		$this->_user_agent->cleaned = preg_replace('#(Android)[ \-/](\d\.\d)([^; /\)]+)#', '$1 $2', $this->_user_agent->cleaned);
 	}
 	/**
 	 * Normalizes BlackBerry user agent strings
@@ -62,7 +62,9 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 		$ua = $this->_user_agent->cleaned;
 		$ua = str_ireplace('blackberry', 'BlackBerry', $ua);
 		$pos = strpos($ua, 'BlackBerry');
-		if($pos !== false && $pos > 0) $ua = substr($ua, $pos);
+		if ($pos !== false && $pos > 0) {
+			$ua = substr($ua, $pos);
+		}
 		$this->_user_agent->cleaned = $ua;
 	}
 	/**
@@ -82,6 +84,9 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 			$this->_user_agent->cleaned = preg_replace('/^(JUC \(Linux; U;)(?= \d)/', '$1 Android', $this->_user_agent->cleaned);
 			$this->_user_agent->cleaned = preg_replace('/(Android|JUC|[;\)])(?=[\w|\(])/', '$1 ', $this->_user_agent->cleaned);
 		}
+	}
+	protected function normalizeTransferEncoding() {
+		$this->_user_agent->cleaned = str_replace(',gzip(gfe)', '', $this->_user_agent->cleaned);
 	}
 	/**
 	 * Removes Vodafone garbage from user agent string

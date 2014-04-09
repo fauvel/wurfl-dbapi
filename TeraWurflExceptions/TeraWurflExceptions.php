@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@
 class TeraWurflException extends Exception {}
 class TeraWurflInvalidUserAgentException extends TeraWurflException {}
 class TeraWurflInvalidDeviceIDException extends TeraWurflException {}
+class TeraWurflInvalidCapabilityException extends TeraWurflException {}
 class TeraWurflDatabaseException extends TeraWurflException {}
 class TeraWurflCLIInvalidArgumentException extends TeraWurflException {}
 class TeraWurflUpdateDownloaderException extends TeraWurflException {}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,10 +24,11 @@ class WindowsPhoneDesktopUserAgentMatcher extends UserAgentMatcher {
 	public static $constantIDs = array(
 		'generic_ms_phone_os7_desktopmode',
 		'generic_ms_phone_os7_5_desktopmode',
+		'generic_ms_phone_os8_desktopmode',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-		return $httpRequest->user_agent->contains('ZuneWP7');
+		return $httpRequest->user_agent->contains(array('WPDesktop', 'ZuneWP7'));
 	}
 	
 	public function applyConclusiveMatch() {
@@ -35,6 +36,7 @@ class WindowsPhoneDesktopUserAgentMatcher extends UserAgentMatcher {
 		return WurflConstants::NO_MATCH;
 	}
 	public function applyRecoveryMatch() {
+		if ($this->userAgent->contains('WPDesktop')) return 'generic_ms_phone_os8_desktopmode';
 		if ($this->userAgent->contains('Trident/5.0')) return 'generic_ms_phone_os7_5_desktopmode';
 		return 'generic_ms_phone_os7_desktopmode';
 	}

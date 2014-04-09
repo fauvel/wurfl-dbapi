@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -134,7 +134,7 @@ class TeraWurflHttpRequestHeader {
 		return (strcmp($find, $this->_normalized_lowercase) === 0);
 	}
     /**
-     * Check if value contains target string
+     * Check if value contains target string or any of the target strings
      * @param string|array $find Target string or array of strings
      * @return bool
      */
@@ -151,7 +151,7 @@ class TeraWurflHttpRequestHeader {
     	}
     }
 	/**
-     * Check if value contains target string (case-insensitive)
+     * Check if value contains target string (case-insensitive) or any of the target strings
      * @param string|array $find Target string or array of strings
      * @return bool
      */
@@ -168,7 +168,7 @@ class TeraWurflHttpRequestHeader {
     	}
     }
     /**
-     * Check if value starts with target string
+     * Check if value starts with target string  or any of the target strings
      * @param string|array $find Target string or array of strings
      * @return bool
      */
@@ -185,7 +185,7 @@ class TeraWurflHttpRequestHeader {
     	}
     }
 	/**
-     * Check if value starts with target string (case-insensitive)
+     * Check if value starts with target string (case-insensitive) or any of the target strings
      * @param string|array $find Target string or array of strings
      * @return bool
      */
@@ -263,27 +263,35 @@ class TeraWurflHttpRequestHeader {
 	 * Returns the character position of the $target string, starting from $startingIndex
 	 * @param string $target
 	 * @param int $startingIndex
+	 * @return int Character position of the first occurance, or boolean false if not found
 	 */
 	public function indexOf($target, $startingIndex=0) {
 		return strpos($this->_normalized, $target, $startingIndex);
 	}
     /**
-     * Returns the character position (index) of the target string, starting from a given index.  If target is not found, returns length of user agent.
+     * Returns the character position (index) of the target string, starting from a given index.  
+     * If target is not found, returns length of user agent.
+     * If target is an array of needles, the needle with the LOWEST character position is returned.
      * @param string|array $target Target string to search for, or, Array of Strings to search for
      * @param int $startingIndex Character postition to start looking for the target
      * @return int Character position (index) or full length
      */
 	public function indexOfOrLength($target, $startingIndex=0) {
 		$length = strlen($this->_normalized);
-		if($startingIndex === false) {
+		if($startingIndex === false || $startingIndex > $length) {
 			return $length;
 		}
 		if(is_array($target)){
+			$shortest_idx = null;
 			foreach($target as $target_n){
 				$pos = strpos($this->_normalized, $target_n, $startingIndex);
-				if($pos !== false) return $pos;
+				if($pos !== false) {
+					if ($shortest_idx === null || $pos < $shortest_idx) {
+						$shortest_idx = $pos;
+					}
+				}
 			}
-			return $length;
+			return ($shortest_idx !== null)? $shortest_idx: $length;
 		}else{
 			$pos = strpos($this->_normalized, $target, $startingIndex);
 			return ($pos === false)? $length : $pos;

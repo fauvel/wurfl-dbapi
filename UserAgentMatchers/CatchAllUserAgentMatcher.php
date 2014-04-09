@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -83,7 +83,7 @@ class CatchAllUserAgentMatcher extends UserAgentMatcher {
 		if ($this->userAgent->contains('UP.Browser/4'))   return 'uptext_generic';
 		if ($this->userAgent->contains('UP.Browser/3'))   return 'uptext_generic';
 		
-		//Series 60
+		// Series 60
 		if ($this->userAgent->contains('Series60')) return 'nokia_generic_series60';
 		
 		// Access/Net Front

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -30,7 +30,7 @@ class SonyEricssonUserAgentMatcher extends UserAgentMatcher {
 		// firstSlash() - 1 because some UAs have revisions that aren't getting detected properly:
 		// SonyEricssonW995a/R1FA Browser/NetFront/3.4 Profile/MIDP-2.1 Configuration/CLDC-1.1 JavaPlatform/JP-8.4.3
 		$tolerance = $this->userAgent->firstSlash() - 1;
-		if($this->userAgent->startsWith('SonyEricsson')){
+		if ($this->userAgent->startsWith('SonyEricsson')) {
 			return $this->risMatch($tolerance);
 		}
 		$tolerance = $this->userAgent->secondSlash();

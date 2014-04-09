@@ -109,7 +109,7 @@ EOL;
 	
 	protected function actionRebuildCache(TeraWurflCLIArgument $arg) {
 		$this->wurfl->db->rebuildCacheTable();
-					echo "Device cache has been rebuilt.\n";
+		echo "Device cache has been rebuilt.\n";
 	}
 	
 	protected function actionCentralTest(TeraWurflCLIArgument $arg) {
@@ -188,26 +188,42 @@ EOF;
 				}
 				break;
 			case "constIDunique":
-				$matcherList = WurflConstants::$matchers;
-				$ids = array();
-				foreach($matcherList as $matcher){
-					$matcherClass = $matcher."UserAgentMatcher";
-					$file = $this->wurfl->rootdir."UserAgentMatchers/{$matcherClass}.php";
-					require_once($file);
-					$properties = get_class_vars($matcherClass);
-					$ids = array_merge($ids,$properties['constantIDs']);
-				}
-				$ids = array_unique($ids);
+				$ids = UserAgentMatcher::getRequiredDeviceIDs();
 				sort($ids);
-				echo implode("\n",$ids);
+				echo implode("\n", $ids);
 				break;
-			case "constIDsanity":
+			case "requiredCaps":
+				$caps = VirtualCapabilityProvider::getRequiredCapabilities();
+				sort($caps);
+				echo implode("\n", $caps);
+				break;
+			case "sanity":
 				$matcherList = WurflConstants::$matchers;
+				$matcherDir = $this->wurfl->rootdir."UserAgentMatchers";
 				$errors = 0;
+				
+				// Check that all matchers exist
 				foreach($matcherList as $matcher){
 					$matcherClass = $matcher."UserAgentMatcher";
-					$file = $this->wurfl->rootdir."UserAgentMatchers/{$matcherClass}.php";
+					$file = "$matcherDir/{$matcherClass}.php";
 					require_once($file);
+				}
+				
+				// Check that there are no loose matchers
+				foreach (glob("$matcherDir/*UserAgentMatcher.php") as $filepath) {
+					$file = basename($filepath);
+					$matcher = str_replace('UserAgentMatcher.php', '', $file);
+					// Remove the UserAgentMatcher base class and SimpleDesktop psuedo-matcher
+					if ($matcher == '' || $matcher == 'SimpleDesktop') continue;
+					if (!in_array($matcher, $matcherList)) {
+						$errors++;
+						echo "Error: Matcher $matcher exists in matcher directory but not in WurflConstants::\$matchers\n";
+					}
+				}
+				
+				// Check WURFL IDs used in matchers
+				foreach($matcherList as $matcher){
+					$matcherClass = $matcher."UserAgentMatcher";
 					$properties = get_class_vars($matcherClass);
 					if(empty($properties['constantIDs'])) continue;
 					foreach ($properties['constantIDs'] as $key => $value) {
@@ -220,11 +236,28 @@ EOF;
 						}
 					}
 				}
+				
+				// Check Virtual Capabilities
+				$before = TeraWurflConfig::$CACHE_ENABLE;
+				TeraWurflConfig::$CACHE_ENABLE = false;
+				$this->wurfl->getDeviceCapabilitiesFromAgent('FooBar');
+				$cap_names = $this->wurfl->virtual_cap_provider->getNames();
+				foreach ($cap_names as $name) {
+					$cap_object = $this->wurfl->virtual_cap_provider->getObject($name);
+					if (!$cap_object->hasRequiredCapabilities()) {
+						$missing_caps = array_diff($cap_object->getRequiredCapabilities(), $this->wurfl->getLoadedCapabilityNames());
+						$missing_caps_nice = implode(', ', $missing_caps);
+						$errors++;
+						echo "Error: the virtual capability $name is missing these capabilities: [$missing_caps_nice]\n";
+					}
+				}
+				
 				if ($errors === 0) {
 					echo "Done. No errors detected.\n";
 				} else {
 					echo "Done. $errors error(s) detected.\n";
 				}
+				TeraWurflConfig::$CACHE_ENABLE = $before;
 				break;
 			case "createProcs":
 				echo "Recreating Procedures.\n";
@@ -290,6 +323,13 @@ EOF;
 					echo implode(', ',$fallback)."\n";
 				}
 				break;
+			case "dumpBuckets":
+				echo "Database API v{$this->wurfl->release_version}; ".$this->wurfl->getSetting(TeraWurfl::$SETTING_WURFL_VERSION)."\n";
+				$this->wurfl->dumpBuckets();
+				break;
+			default:
+				throw new TeraWurflCLIInvalidArgumentException("The debug option [{$arg->value}] does not exist");
+				break;
 		}
 	}
 	
@@ -308,7 +348,7 @@ Usage: php cmd_line_admin.php [OPTIONS]
 
 Option                     Meaning
  --help                    Show this message
- --update=<local,remote>   Update Tera-WURFL:
+ --update=<local,remote>   Update WURFL data:
                              Update from your local wurfl.xml file:
                                --update=local
                              Update the WURFL data from ScientiaMobile:
@@ -318,7 +358,7 @@ Option                     Meaning
  --clearCache              Clear the device cache
  --rebuildCache            Rebuild the device cache by redetecting all
                              cached devices using the current WURFL
- --stats                   Show statistics about the Tera-WURFL Database
+ --stats                   Show statistics about the Database API
  --centralTest=<unit|regression|all|single/<test_name>>
                            Run tests from the ScientiaMobile Central
                              testing repository.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,7 +27,6 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 	 * @var array
 	 */
 	protected static $CONNECTION_OPTIONS = array(
-		"persist" => "Tera-WURFL",
 //		"timeout" => 500,
 //		"replicaSet" => true,
 	);
@@ -64,7 +63,7 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 	public $connected = false;
 
 	/**
-	 * @var Mongo
+	 * @var MongoClient
 	 */
 	protected $mongo;
 
@@ -440,7 +439,7 @@ EOL;
 		$this->numQueries++;
 
 		try {
-			$this->mongo = new Mongo(TeraWurflConfig::$DB_HOST,self::$CONNECTION_OPTIONS);
+			$this->mongo = new MongoClient(TeraWurflConfig::$DB_HOST,self::$CONNECTION_OPTIONS);
 			$this->dbcon = $this->mongo->selectDB(TeraWurflConfig::$DB_SCHEMA);
 
 			if (!empty(TeraWurflConfig::$DB_USER) && !empty(TeraWurflConfig::$DB_PASS)) {
@@ -630,7 +629,7 @@ EOL;
 	 * @return boolean
 	 */
 	public static function extensionLoaded() {
-		return class_exists('Mongo');
+		return class_exists('MongoClient');
 	}
 
 	/**#@+

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -36,114 +36,36 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		'generic_android_ver2_1',
 		'generic_android_ver2_2',
 		'generic_android_ver2_3',
+		'generic_android_ver4',
+		'generic_android_ver4_1',
+		'generic_android_ver4_2',
+		'generic_android_ver4_3',
+		'generic_android_ver4_4',
+		'generic_android_ver5_0',
+
+		'generic_android_ver1_5_tablet',
+		'generic_android_ver1_6_tablet',
+		'generic_android_ver2_tablet',
+		'generic_android_ver2_1_tablet',
+		'generic_android_ver2_2_tablet',
+		'generic_android_ver2_3_tablet',
 		'generic_android_ver3_0',
 		'generic_android_ver3_1',
 		'generic_android_ver3_2',
 		'generic_android_ver3_3',
-		'generic_android_ver4',
-		'generic_android_ver4_1',
-		
-		'uabait_opera_mini_android_v50',
-		'uabait_opera_mini_android_v51',
-		'generic_opera_mini_android_version5',
-	
-		'generic_android_ver1_5_opera_mobi',
-		'generic_android_ver1_5_opera_mobi_11',
-		'generic_android_ver1_6_opera_mobi',
-		'generic_android_ver1_6_opera_mobi_11',
-		'generic_android_ver2_0_opera_mobi',
-		'generic_android_ver2_0_opera_mobi_11',
-		'generic_android_ver2_1_opera_mobi',
-		'generic_android_ver2_1_opera_mobi_11',
-		'generic_android_ver2_2_opera_mobi',
-		'generic_android_ver2_2_opera_mobi_11',
-		'generic_android_ver2_3_opera_mobi',
-		'generic_android_ver2_3_opera_mobi_11',
-		'generic_android_ver4_0_opera_mobi',
-		'generic_android_ver4_0_opera_mobi_11',
-	
-		'generic_android_ver2_1_opera_tablet',
-		'generic_android_ver2_2_opera_tablet',
-		'generic_android_ver2_3_opera_tablet',
-		'generic_android_ver3_0_opera_tablet',
-		'generic_android_ver3_1_opera_tablet',
-		'generic_android_ver3_2_opera_tablet',
-		
-		'generic_android_ver2_0_fennec',
-		'generic_android_ver2_0_fennec_tablet',
-		'generic_android_ver2_0_fennec_desktop',
-		
-		'generic_android_ver1_6_ucweb',
-		'generic_android_ver2_0_ucweb',
-		'generic_android_ver2_1_ucweb',
-		'generic_android_ver2_2_ucweb',
-		'generic_android_ver2_3_ucweb',
-	
-		'generic_android_ver2_0_netfrontlifebrowser',
-		'generic_android_ver2_1_netfrontlifebrowser',
-		'generic_android_ver2_2_netfrontlifebrowser',
-		'generic_android_ver2_3_netfrontlifebrowser',
+		'generic_android_ver4_tablet',
+		'generic_android_ver4_1_tablet',
+		'generic_android_ver4_2_tablet',
+		'generic_android_ver4_3_tablet',
+		'generic_android_ver4_4_tablet',
+		'generic_android_ver5_0_tablet',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-		if ($httpRequest->isDesktopBrowser()) return false;
 		return $httpRequest->user_agent->contains('Android');
 	}
 	
 	public function applyConclusiveMatch() {
-		// Opera Mini
-		if ($this->userAgent->contains('Opera Mini')) {
-			if ($this->userAgent->contains(' Build/')) {
-				return $this->risMatch($this->userAgent->indexOfOrLength(' Build/'));
-			}
-			$prefixes = array(
-				'Opera/9.80 (J2ME/MIDP; Opera Mini/5' => 'uabait_opera_mini_android_v50',
-				'Opera/9.80 (Android; Opera Mini/5.0' => 'uabait_opera_mini_android_v50',
-				'Opera/9.80 (Android; Opera Mini/5.1' => 'uabait_opera_mini_android_v51',
-			);
-			foreach ($prefixes as $prefix => $defaultID) {
-				if ($this->userAgent->startsWith($prefix)) {
-					// If RIS returns a non-generic match, return it, else, return the default
-					return $this->risMatchUAPrefix($prefix, $defaultID);
-				}
-			}
-		}
-		
-		// Opera Mobi
-		if ($this->userAgent->contains('Opera Mobi')) {
-			return $this->risMatch($this->userAgent->secondSlash());
-		}
-		
-		// Opera Tablet
-		if ($this->userAgent->contains('Opera Tablet')) {
-			return $this->risMatch($this->userAgent->secondSlash());
-		}
-		
-		// Fennec
-		if ($this->userAgent->contains(array('Fennec', 'Firefox'))) {
-			return $this->risMatch($this->userAgent->indexOfOrLength(')'));
-		}
-		
-		// UCWEB7
-		if ($this->userAgent->contains('UCWEB7')) {
-			// The tolerance is after UCWEB7, not before
-			$find = 'UCWEB7';
-			$tolerance = $this->userAgent->indexOf($find) + strlen($find);
-			if ($tolerance > $this->userAgent->length()) {
-				$tolerance = $this->userAgent->length();
-			}
-			return $this->risMatch($tolerance);
-		}
-		
-		// NetFrontLifeBrowser
-		if ($this->userAgent->contains('NetFrontLifeBrowser/2.2')) {
-			$find = 'NetFrontLifeBrowser/2.2';
-			$tolerance = $this->userAgent->indexOf($find) + strlen($find);
-			if ($tolerance > $this->userAgent->length()) {
-				$tolerance = $this->userAgent->length();
-			}
-			return $this->risMatch($tolerance);
-		}
 		// Apply Version+Model--- matching normalization
 		$model = self::getAndroidModel($this->userAgent, false);
 		$version = self::getAndroidVersion($this->userAgent, false);
@@ -155,97 +77,33 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		}
 		
 		// Standard RIS Matching
-		$tolerance = min($this->userAgent->indexOfOrLength(' Build/'), $this->userAgent->indexOfOrLength(' AppleWebKit'));
+		$tolerance = $this->userAgent->indexOfOrLength(array(' Build/', ' AppleWebKit'));
 		return $this->risMatch($tolerance);
 	}	
 	
-	public function applyRecoveryMatch(){
-		// Opera Mini
-		if ($this->userAgent->contains('Opera Mini')) {
-			return 'generic_opera_mini_android_version5';
-		}
-		
-		// Opera Mobi
-		if ($this->userAgent->contains('Opera Mobi')) {
-			$android_version = self::getAndroidVersion($this->userAgent);
-			$opera_version = self::getOperaOnAndroidVersion($this->userAgent);
-			// convert versions (2.1) to device ID versions (2_1)
-			$android_version_string = str_replace('.', '_', $android_version);
-			// Build initial device ID string
-			$deviceID = 'generic_android_ver'.$android_version_string.'_opera_mobi';
-			// Opera Mobi 10 does not have a version in its WURFL ID (ex: generic_android_ver1_5_opera_mobi)
-			if ($opera_version != '10') {
-				$deviceID .= '_'.$opera_version;
-			}
-			// Device ID should look something like this at this point: generic_android_ver2_3_opera_mobi_11
-			// Now we must make sure the deviceID is valid
-			if (in_array($deviceID, self::$constantIDs)) {
-				return $deviceID;
-			} else {
-				return 'generic_android_ver2_0_opera_mobi';
-			}
-		}
-		
-		// Opera Tablet
-		if ($this->userAgent->contains('Opera Tablet')) {
-			$android_version = (float)self::getAndroidVersion($this->userAgent);
-			if ($android_version < 2.1) {
-				 $android_version = 2.1;
-			} else if ($android_version > 3.2) {
-				$android_version = 3.2;
-			}
-			$android_version_string = str_replace('.', '_', (string)$android_version);
-			$deviceID = 'generic_android_ver'.$android_version_string.'_opera_tablet';
-			if (in_array($deviceID, self::$constantIDs)) {
-				return $deviceID;
-			} else {
-				return 'generic_android_ver2_1_opera_tablet';
-			}
-		}
-		
-		// UCWEB7
-		if ($this->userAgent->contains('UCWEB7')) {
-			$android_version_string = str_replace('.', '_', self::getAndroidVersion($this->userAgent));
-			$deviceID = 'generic_android_ver'.$android_version_string.'_ucweb';
-			if (in_array($deviceID, self::$constantIDs)) {
-				return $deviceID;
-			} else {
-				return 'generic_android_ver2_0_ucweb';
-			}
-		}
-		
-		// Fennec
-		$is_fennec = $this->userAgent->contains('Fennec');
-		$is_firefox = $this->userAgent->contains('Firefox');
-		if ($is_fennec || $is_firefox) {
-			if ($is_fennec || $this->userAgent->contains('Mobile')) return 'generic_android_ver2_0_fennec';
-			if ($is_firefox) {
-				if ($this->userAgent->contains('Tablet')) return 'generic_android_ver2_0_fennec_tablet';
-				if ($this->userAgent->contains('Desktop')) return 'generic_android_ver2_0_fennec_desktop';
-				return WurflConstants::NO_MATCH;
-			}
-		}
-		
-		// NetFrontLifeBrowser
-		if ($this->userAgent->contains('NetFrontLifeBrowser')) {
-			// generic_android_ver2_0_netfrontlifebrowser
-			$android_version_string = str_replace('.', '_', self::getAndroidVersion($this->userAgent));
-			$deviceID = 'generic_android_ver'.$android_version_string.'_netfrontlifebrowser';
-			if (in_array($deviceID, self::$constantIDs)) {
-				return $deviceID;
-			} else {
-				return 'generic_android_ver2_0_netfrontlifebrowser';
-			}
-		}
-		
-		// Generic Android
-		if ($this->userAgent->contains('Froyo')){
+	public function applyRecoveryMatch() {
+		if ($this->userAgent->contains('Froyo')) {
 			return 'generic_android_ver2_2';
 		}
-		$version_string = str_replace('.', '_', self::getAndroidVersion($this->userAgent));
+		
+		$android_version = self::getAndroidVersion($this->userAgent);
+		$version_string = str_replace('.', '_', $android_version);
 		$deviceID = 'generic_android_ver'.$version_string;
+		
+		// Handle exceptions to the WURFL naming convention
 		if ($deviceID == 'generic_android_ver2_0') $deviceID = 'generic_android_ver2';
 		if ($deviceID == 'generic_android_ver4_0') $deviceID = 'generic_android_ver4';
+		
+		// Find a generic Android device ID
+		if (($android_version < 3.0 || $android_version >= 4.0) 
+				&& $this->userAgent->contains('Safari') 
+				&& !$this->userAgent->contains('Mobile')) {
+			// This is probably a tablet (Android 3.x is always a tablet, so it doesn't have a "_tablet" ID)
+			if (in_array($deviceID.'_tablet', self::$constantIDs)) {
+				return $deviceID.'_tablet';
+			}
+			return 'generic_android_ver1_5_tablet';
+		}
 		if (in_array($deviceID, self::$constantIDs)) {
 			return $deviceID;
 		}
@@ -255,8 +113,9 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 	
 	
 	/********* Android Utility Functions ***********/
-	public static $defaultAndroidVersion = '2.0';
-	public static $validAndroidVersions = array('1.0', '1.5', '1.6', '2.0', '2.1', '2.2', '2.3', '2.4', '3.0', '3.1', '3.2', '3.3', '4.0', '4.1');
+	const ANDROID_DEFAULT_VERSION = 2.0;
+	
+	public static $validAndroidVersions = array('1.0', '1.5', '1.6', '2.0', '2.1', '2.2', '2.3', '2.4', '3.0', '3.1', '3.2', '3.3', '4.0', '4.1', '4.2', '4.3', '4.4', '5.0');
 	public static $androidReleaseMap = array(
 		'Cupcake' => '1.5',
 		'Donut' => '1.6',
@@ -264,78 +123,121 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		'Froyo' => '2.2',
 		'Gingerbread' => '2.3',
 		'Honeycomb' => '3.0',
-		// 'Ice Cream Sandwich' => '4.0',
+		'Ice Cream Sandwich' => '4.0',
+		'Jelly Bean' => '4.1', // Note: 4.2/4.3 is also Jelly Bean
+		'KitKat' => '4.4',
 	);
+	
 	/**
 	 * Get the Android version from the User Agent, or the default Android version is it cannot be determined
 	 * @param string $ua User Agent
 	 * @param boolean $use_default Return the default version on fail, else return null
 	 * @return string Android version
-	 * @see self::$defaultAndroidVersion
+	 * @see self::ANDROID_DEFAULT_VERSION
 	 */
 	public static function getAndroidVersion($ua, $use_default=true) {
 		// Replace Android version names with their numbers
 		// ex: Froyo => 2.2
 		$ua = str_replace(array_keys(self::$androidReleaseMap), array_values(self::$androidReleaseMap), $ua);
-		if (preg_match('/Android (\d\.\d)/', $ua, $matches)) {
+		
+		// Initializing $version
+		$version = null;
+		
+		// Look for "Android <Version>" first and then for "Android/<Version>"
+		if (preg_match('#Android (\d\.\d)#', $ua, $matches)) {
 			$version = $matches[1];
-			if (in_array($version, self::$validAndroidVersions)) {
-				return $version;
-			}
+		} else if (preg_match('#Android/(\d\.\d)#', $ua, $matches)) {
+			$version = $matches[1];
 		}
-		return $use_default? self::$defaultAndroidVersion: null;
+		
+		// Now check extracted Android version for validity
+		if (in_array($version, self::$validAndroidVersions)) {
+			return $version;
+		}
+		return $use_default? self::ANDROID_DEFAULT_VERSION: null;
 	}
 	
-	public static $defaultOperaVersion = '10';
-	public static $validOperaVersions = array('10', '11');
 	/**
-	 * Get the Opera browser version from an Opera Android user agent
-	 * @param string $ua User Agent
-	 * @param boolean $use_default Return the default version on fail, else return null
-	 * @return string Opera version
-	 * @see self::$defaultOperaVersion
+	 * Get the model name from the provided user agent or null if it cannot be determined
+	 * @param string $ua
+	 * @param string $use_default
+	 * @return NULL|string
 	 */
-	public static function getOperaOnAndroidVersion($ua, $use_default=true) {
-		if (preg_match('/Version\/(\d\d)/', $ua, $matches)) {
-			$version = $matches[1];
-			if (in_array($version, self::$validOperaVersions)) {
-				return $version;
-			}
-		}
-		return $use_default? self::$defaultOperaVersion: null;
-	}
-	
 	public static function getAndroidModel($ua, $use_default=true) {
+		// Normalize spaces in UA before capturing parts
+		$ua = preg_replace('|;(?! )|', '; ', $ua);
+		
+		// Different logic for Mozillite and non-Mozillite UAs to isolate model name
+		// Non-Mozillite UAs get first preference
+		if (preg_match('#(^[A-Za-z0-9_\-\+ ]+)[/ ]?(?:[A-Za-z0-9_\-\+\.]+)? +Linux/[0-9\.]+ +Android[ /][0-9\.]+ +Release/[0-9\.]+#', $ua, $matches)) {
+			// Trim off spaces and semicolons
+			$model = rtrim($matches[1], ' ;');
+			
 		// Locales are optional for matching model name since UAs like Chrome Mobile do not contain them
-		if (!preg_match('#Android [^;]+;(?: xx-xx;)? (.+?) Build/#', $ua, $matches)) {
+		} else if (preg_match('#Android [^;]+;(?>(?: xx-xx[ ;]+)?)(.+?)(?:Build/|\))#', $ua, $matches)) {
+			// Trim off spaces and semicolons
+			$model = rtrim($matches[1], ' ;');
+			
+		} else {
 			return null;
 		}
-		// Trim off spaces and semicolons
-		$model = rtrim($matches[1], ' ;');
+		
 		// The previous RegEx may return just "Build/.*" for UAs like:
 		// HTC_Dream Mozilla/5.0 (Linux; U; Android 1.5; xx-xx; Build/CUPCAKE) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
-		if (strpos('Build/', $model) === 0) {
+		if (strpos($model, 'Build/') === 0) {
 			return null;
+		}
+
+		// Normalize Chinese UAs
+		$model = preg_replace('#(?:_CMCC_TD|_CMCC|_TD)\b#', '', $model);
+		
+		// Normalize models with resolution
+		if (strpos($model, '*') !== false) {
+			if (($pos = strpos($model, '/')) !== false) {
+				$model = substr($model, 0, $pos);
+			}
+		}
+		
+		// Normalize Huawei UAs
+		$model = str_replace('HW-HUAWEI_', 'HUAWEI ', $model);
+		
+		// Normalize Coolpad UAs
+		if (strpos($model, 'YL-Coolpad') !== false) {
+			$model = preg_replace('#YL-Coolpad[ _]#', 'Coolpad ', $model);
 		}
 		
 		// HTC
 		if (strpos($model, 'HTC') !== false) {
 			// Normalize "HTC/"
 			$model = preg_replace('#HTC[ _\-/]#', 'HTC~', $model);
+			
 			// Remove the version
-			$model = preg_replace('#(/| V?[\d\.]).*$#', '', $model);
-			$model = preg_replace('#/.*$#', '', $model);
+			if (($pos = strpos($model, '/')) !== false) {
+				$model = substr($model, 0, $pos);
+			}
+			$model = preg_replace('#( V| )\d+?\.[\d\.]+$#', '', $model);
+			
 		}
+		
 		// Samsung
 		$model = preg_replace('#(SAMSUNG[^/]+)/.*$#', '$1', $model);
+		
 		// Orange
 		$model = preg_replace('#ORANGE/.*$#', 'ORANGE', $model);
+		
 		// LG
-		$model = preg_replace('#(LG-[^/]+)/[vV].*$#', '$1', $model);
+		$model = preg_replace('#(LG-[A-Za-z0-9\-]+).*$#', '$1', $model);
+		
 		// Serial Number
 		$model = preg_replace('#\[[\d]{10}\]#', '', $model);
 		
-		return trim($model);
+		// Remove whitespace
+		$model = trim($model);
+		
+		// Normalize Samsung and Sony/SonyEricsson model name changes due to Chrome Mobile
+		$model = preg_replace('#^(?:SAMSUNG|SonyEricsson|Sony)[ \-]?#', '', $model);
+		
+		return (strlen($model) === 0)? null: $model;
 	}
 	
 }

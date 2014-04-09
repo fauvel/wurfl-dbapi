@@ -1,5 +1,64 @@
 ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 
+[2013.12.13] ScientiaMobile Database API 1.5.1.0
+- Added support in Virtual Capabilities for:
+	- Internet Explorer 11
+	- Windows 8.1
+	- OS extraction for Opera Mini User-Agents
+- Improved detection of:
+	- Android
+	- Apple iOS
+	- Xbox One
+	- Pantech feature phones
+- Added new matcher for Desktop Applications
+- Optimized matcher order
+ 
+[2013.10.14] ScientiaMobile Database API 1.5.0.2
+- Bugfix: Virtual capabilities unavailable
+
+[2013.10.03] ScientiaMobile Database API 1.5.0.1
+- Added more virtual capabilities
+- Bugfix: Chrome matcher fails with malformed UA
+- Added CLI option --debug=requiredCaps
+
+[2013.09.27] ScientiaMobile Database API 1.5.0.0
+- New Feature: Virtual Capabilities
+- Added MongoDB Client 1.2 Support
+- Improved normalization
+- Improved detection of:
+    - Android
+    - Apple iOS
+    - Windows Phone
+    - Firefox Mobile
+    - Firefox OS
+    - SmartTVs
+    - BlackBerry
+    - Skyfire
+    - Opera Mini
+    - UCWEB
+    - Robots
+    - Native apps
+
+[2013.01.11] ScientiaMobile Database API 1.4.4.0
+- Improved detection of Android 4.1+
+- Improved detection of Windows RT
+- Simplified detection of Firefox desktop
+- Improved detection of Xbox console
+- Improved detection of Opera Mobi and Opera Tablet
+
+[2012.11.07] ScientiaMobile Database API 1.4.3.0
+- Improved detection of Kindle Fire
+- Improved detection of Playstation Vita
+- Improved detection of Windows Phone
+- Improved detection of Windows RT
+- Improved detection of Safari desktop browser
+- Added Device-Stock-UA support
+- Improved detection of Maemo devices
+- Improved detection of SmartTVs
+- Improved detection of XBOX 360
+- Improved detection of Epiphany browser
+- Updated WURFL database
+
 [2012.09.04] ScientiaMobile Database API 1.4.2.0
 - Improved detection of Chrome Mobile
 - Improved detection of Smart TVs

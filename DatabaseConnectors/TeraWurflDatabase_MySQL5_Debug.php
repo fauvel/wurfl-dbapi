@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 ScientiaMobile, Inc.
+ * Copyright (c) 2014 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -32,8 +32,8 @@ class TeraWurflDatabase_MySQL5_Debug extends TeraWurflDatabase_MySQL5 {
 		return self::$match_debug;
 	}
 
-	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher &$matcher) {
-		$result = parent::getDeviceFromUA_RIS($userAgent,$tolerance,&$matcher);
+	public function getDeviceFromUA_RIS($userAgent,$tolerance,UserAgentMatcher $matcher) {
+		$result = parent::getDeviceFromUA_RIS($userAgent,$tolerance,$matcher);
 		$device_list = array();
 		$max_match_len = 0;
 		if ($result != WurflConstants::NO_MATCH) {
