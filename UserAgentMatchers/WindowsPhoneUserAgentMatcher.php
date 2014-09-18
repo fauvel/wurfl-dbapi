@@ -29,18 +29,19 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		'generic_ms_phone_os7_5',
 		'generic_ms_phone_os7_8',
 		'generic_ms_phone_os8',
+		'generic_ms_phone_os8_1',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return $httpRequest->user_agent->contains(array('Windows Phone', 'NativeHost'));
+		return $httpRequest->user_agent->contains(array('Windows Phone', 'WindowsPhone','NativeHost'));
 	}
 	
 	public function applyConclusiveMatch() {
 		
-		if ($this->userAgent->startsWith('Windows Phone Ad Client')) {
+		if ($this->userAgent->startsWith('Windows Phone Ad Client') || $this->userAgent->startsWith('WindowsPhoneAdClient')) {
 			$model = self::getWindowsPhoneAdClientModel($this->userAgent);
-			$version = self::getWindowsPhoneAdClientVersion($this->userAgent);
+			$version = self::getWindowsPhoneVersion($this->userAgent);
 		} else if ($this->userAgent->contains('NativeHost')) {
 			return 'generic_ms_phone_os7';
 		} else {
@@ -58,19 +59,20 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		return WurflConstants::NO_MATCH;
 	}
 	public function applyRecoveryMatch() {
-		// "Windows Phone OS 8" is for MS Ad SDK issues
-		if ($this->userAgent->contains(array('Windows Phone 8', 'Windows Phone OS 8'))) return 'generic_ms_phone_os8';
 		
-		if ($this->userAgent->contains('Windows Phone OS 7.8')) return 'generic_ms_phone_os7_8';
+		$version = self::getWindowsPhoneVersion($this->userAgent);
 		
-		// WP OS 7.10 = Windows Phone 7.5 or 7.8
-		if ($this->userAgent->contains(array('Windows Phone OS 7.5', 'Windows Phone OS 7.10'))) return 'generic_ms_phone_os7_5';
-		
-		// Looking for "Windows Phone OS 7" instead of "Windows Phone OS 7.0" to address all WP 7 UAs that we may not catch else where
-		if ($this->userAgent->contains('Windows Phone OS 7')) return 'generic_ms_phone_os7';
-		
-		if ($this->userAgent->contains('Windows Phone 6.5')) return 'generic_ms_winmo6_5';
-		
+		if ($version == "8.1") return 'generic_ms_phone_os8_1';
+		if ($version == "8.0") return 'generic_ms_phone_os8';
+		if ($version == "7.8") return 'generic_ms_phone_os7_8';
+		if ($version == "7.5") return 'generic_ms_phone_os7_5';
+		if ($version == "7.0") return 'generic_ms_phone_os7';
+		if ($version == "6.5") return 'generic_ms_winmo6_5';
+
+		//These are probably UAs of the type "Windows Phone Ad Client (Xna)/5.1.0.0 BMID/E67970D969"
+		if ($this->userAgent->startsWith('Windows Phone Ad Client') || $this->userAgent->startsWith('WindowsPhoneAdClient')) {
+			return 'generic_ms_phone_os7';	
+		}
 		return WurflConstants::NO_MATCH;
 	}
 	
@@ -109,7 +111,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 	public static function getWindowsPhoneAdClientModel($ua) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
-		if (preg_match('|Windows Phone Ad Client/[0-9\.]+ \(.+; ?Windows Phone(?: OS)? [0-9\.]+; ?([^;\)]+(; ?[^;\)]+)?)|', $ua, $matches)) {
+		if (preg_match('|Windows ?Phone ?Ad ?Client/[0-9\.]+ ?\(.+; ?Windows ?Phone(?: ?OS)? ?[0-9\.]+; ?([^;\)]+(; ?[^;\)]+)?)|', $ua, $matches)) {
 			$model = $matches[1];
 			$model = str_replace('_blocked', '', $model);
 			$model = preg_replace('/(NOKIA; RM-.+?)_.*/', '$1', $model, 1);
@@ -120,23 +122,21 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 
 		
 	public static function getWindowsPhoneVersion($ua) {
-		if (preg_match('|Windows Phone(?: OS)? (\d+\.\d+)|', $ua, $matches)) {
-			return $matches[1];
-		}
-		return null;
-	}
-	
-	public static function getWindowsPhoneAdClientVersion($ua) {
-		if (preg_match('|Windows Phone(?: OS)? (\d+)\.(\d+)|', $ua, $matches)) {
-			switch ((int)$matches[1]) {
-				case 8:
-					return '8.0';
-					break;
-				case 7:
-					return ((int)$matches[2] == 10)? '7.5': '7.0';
-					break;
+		if (preg_match('|Windows ?Phone(?: ?OS)? ?(\d+\.\d+)|', $ua, $matches)) {
+			if (strpos($matches[1], "6.3") !== false || strpos($matches[1], "8.1") !== false) {
+				return '8.1';
+			} else if (strpos($matches[1], "8.") !== false) {
+				return '8.0';
+			} else if (strpos($matches[1], "7.8") !== false) {
+				return '7.8';
+			} else if (strpos($matches[1], "7.10") !== false || strpos($matches[1], "7.5") !== false) {
+				return '7.5';
+			} else if (strpos($matches[1], "6.5") !== false) {
+				return '6.5';
+			} else {
+				return '7.0';
 			}
-		}
+		}	
 		return null;
 	}
 }

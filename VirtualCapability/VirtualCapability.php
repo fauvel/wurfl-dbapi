@@ -178,6 +178,8 @@ class VirtualCapability_IsApp extends VirtualCapability {
 		'#iP(hone|od|ad)[\d],[\d]#',
 		// namespace notation (com.google.youtube)
 		'#[a-z]{3,}(?:\.[a-z]+){2,}#',
+		//Windows MSIE Webview
+		'WebView',
 	);
 	
 	protected function compute() {
@@ -222,6 +224,13 @@ class VirtualCapability_IsRobot extends VirtualCapability {
 	protected function compute() {
 		// Control cap, "controlcap_is_robot" is checked before this function is called
 		
+		if ($this->wurfl->httpRequest->headerExists("HTTP_ACCEPT_ENCODING") 
+			&& $this->wurfl->httpRequest->user_agent->contains("Trident/")
+			&& !$this->wurfl->httpRequest->getHeader("HTTP_ACCEPT_ENCODING")->contains("deflate")) {
+			return true;
+		}
+		
+		
 		// Check against standard bot list
 		return $this->wurfl->httpRequest->isRobot();
 	}
@@ -245,6 +254,56 @@ class VirtualCapability_IsMobile extends VirtualCapability {
 	}
 }
 
+class VirtualCapability_CompleteDeviceName extends VirtualCapability {
+
+	protected $required_capabilities = array(
+		'brand_name',
+		'model_name',
+		'marketing_name',
+	);
+
+	protected function compute() {
+		$parts = array($this->wurfl->brand_name);
+		if (strlen($this->wurfl->model_name)) 
+			$parts[] = $this->wurfl->model_name;
+		if (strlen($this->wurfl->marketing_name))
+			$parts[] = "({$this->wurfl->marketing_name})";
+
+		return implode(' ', $parts);
+	}
+}
+
+class VirtualCapability_FormFactor extends VirtualCapability {
+
+	protected $required_capabilities = array(
+		'ux_full_desktop',
+		'is_smarttv',
+		'is_wireless_device',
+		'is_tablet',
+		'can_assign_phone_number',
+	);
+
+	public function compute() {
+		$map = array(
+			'Robot'            => $this->wurfl->is_robot,
+			'Desktop'          => $this->wurfl->ux_full_desktop,
+			'Smart-TV'         => $this->wurfl->is_smarttv,
+			'Other Non-Mobile' => !$this->wurfl->is_wireless_device,
+			'Tablet'           => $this->wurfl->is_tablet,
+			'Smartphone'       => $this->wurfl->is_smartphone,
+			'Feature Phone'    => $this->wurfl->can_assign_phone_number,
+		);
+
+		foreach ($map as $type => $condition) {
+			if ($condition) {
+				return $type;
+			}
+		}
+
+		return 'Feature Phone';
+	}
+}
+
 
 class VirtualCapability_IsSmartphone extends VirtualCapability {
 	
@@ -257,11 +316,13 @@ class VirtualCapability_IsSmartphone extends VirtualCapability {
 		'resolution_width',
 		'device_os_version',
 		'device_os',
+		'can_assign_phone_number',
 	);
 
 	protected function compute() {
 		if (!$this->wurfl->is_wireless_device) return false;
 		if ($this->wurfl->is_tablet) return false;
+		if (!$this->wurfl->can_assign_phone_number) return false;
 		if ($this->wurfl->pointing_method != 'touchscreen') return false;
 		if ($this->wurfl->resolution_width < 320) return false;
 		$os_ver = (float)$this->wurfl->device_os_version;

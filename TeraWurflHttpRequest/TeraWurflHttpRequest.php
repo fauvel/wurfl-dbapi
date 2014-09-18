@@ -54,10 +54,12 @@ class TeraWurflHttpRequest {
 	
 	
 	private $_http_headers;
+	private $_override_sideloaded_browser_ua;
 	
 	
-	public function __construct($raw_http_headers=null) {
+	public function __construct($raw_http_headers=null, $override_sideloaded_browser_ua=true) {
 		$headers = ($raw_http_headers === null)? $_SERVER: $raw_http_headers;
+		$this->_override_sideloaded_browser_ua = $override_sideloaded_browser_ua;
 		$this->importHeaders($headers);
 		$this->assignUserAgent();
 		$this->assignUserAgentProfile();
@@ -123,7 +125,14 @@ class TeraWurflHttpRequest {
 	 */
 	public function isRobot() {
 		if ($this->_is_robot === null) {
-			$this->_is_robot = $this->user_agent->iContains(WurflConstants::$ROBOTS)? true: false;
+			$this->_is_robot = false;
+			$lcase_user_agent = strtolower($this->user_agent->original);
+			foreach (WurflConstants::$ROBOTS as $needle) {
+				if (strpos($lcase_user_agent, $needle) !== false) {
+					$this->_is_robot = true;
+					break;
+				}
+			}
 		}
 		return $this->_is_robot;
 	}
@@ -136,6 +145,9 @@ class TeraWurflHttpRequest {
 		$clean_http_headers = $this->cleanHeaders($raw_http_headers);
 		$this->_http_headers = array();
 		foreach ($clean_http_headers as $name => $value) {
+			if (strpos($name, 'HTTP_') !== 0 && !is_scalar($value)) {
+				continue;
+			}
 			if (in_array($name, $this->_user_agent_search_order)) {
 				$this->_http_headers[$name] = new TeraWurflUserAgent($name, $value);
 				continue;
@@ -152,6 +164,10 @@ class TeraWurflHttpRequest {
 	 * Finds the correct User Agent Header for WURFL Matching and stores its key
 	 */
 	private function assignUserAgent() {
+		if (!$this->_override_sideloaded_browser_ua) {
+			$this->_user_agent_key = 'HTTP_USER_AGENT';
+			return;
+		}
 		foreach ($this->_user_agent_search_order as $header) {
 			if (array_key_exists($header, $this->_http_headers)) {
 				$this->_user_agent_key = $header;

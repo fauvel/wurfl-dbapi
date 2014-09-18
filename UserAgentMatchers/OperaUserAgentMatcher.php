@@ -31,11 +31,22 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 		'opera_10',
 		'opera_11',
 		'opera_12',
+		'opera_15',
+		'opera_16',
+		'opera_17',
+		'opera_18',
+		'opera_19',
+		'opera_20',
+		'opera_21',
+		'opera_22',
+		'opera_23',
+		'opera_24',
+		'opera_25',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isMobileBrowser()) return false;
-		return $httpRequest->user_agent->contains('Opera');
+		return $httpRequest->user_agent->contains(array('Opera','OPR/'));
 	}
 	
 	/**
@@ -54,6 +65,13 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 			// Match to the '.' in the Opera version number
 			return $this->risMatch($this->userAgent->indexOf('.'));
 		}
+		
+		// Normalize Opera v15 and above UAs, that say OPR, into "Opera/version UA" format used above 
+		if (preg_match('#OPR/(\d+\.\d+)#', $this->userAgent, $matches)) {
+		$prefix = "Opera/".$matches[1]." ";
+		$this->userAgent->set($prefix.$this->userAgent);
+		}
+		
 		$opera_idx = $this->userAgent->indexOf('Opera');
 		$tolerance = $this->userAgent->indexOfOrLength('.', $opera_idx);
 		return $this->risMatch($tolerance);
