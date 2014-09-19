@@ -33,8 +33,10 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser {
 	
 	public function open($filename, $file_type){
 		$this->file_type = $file_type;
+		if (!is_readable($filename)) {
+			throw new Exception("Unable to read WURFL file: $filename");
+		}
 		$this->xml->open($filename);
-		//TODO: add error handling
 	}
 	public function process(Array &$destination){
 		$this->devices =& $destination;
@@ -97,9 +99,11 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser {
 						$includegroup = false;
 						continue;
 					}
+					if($groupname == "virtual_capabilities") continue;
 					$device[$groupname] = array();
 					break;
 				case "capability":
+					if($groupname == "virtual_capabilities") continue;
 					if(!$filtering || ($filtering && $includegroup)){
 						// the groupdevice array must already exist
 						$device[$groupname][$this->xml->getAttribute('name')] = self::cleanValue($this->xml->getAttribute('value'));

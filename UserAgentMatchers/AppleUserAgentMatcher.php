@@ -36,6 +36,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver5',
 		'apple_ipod_touch_ver6',
 		'apple_ipod_touch_ver7',
+		'apple_ipod_touch_ver8',
 	
 		'apple_ipad_ver1',
 		'apple_ipad_ver1_subua32',
@@ -43,6 +44,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub5',
 		'apple_ipad_ver1_sub6',
 		'apple_ipad_ver1_sub7',
+		'apple_ipad_ver1_sub8',
 	
 		'apple_iphone_ver1',
 		'apple_iphone_ver2',
@@ -51,6 +53,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver5',
 		'apple_iphone_ver6',
 		'apple_iphone_ver7',
+		'apple_iphone_ver8',
 	
 		//iOS HW IDs
 		'apple_ipad_ver1_subhw1',
@@ -82,6 +85,11 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub71_subhwmini1',
 		'apple_ipad_ver1_sub71_subhwmini2',
 		'apple_ipad_ver1_sub71_subhwair',
+		'apple_ipad_ver1_sub8_subhw2',
+		'apple_ipad_ver1_sub8_subhw3',
+		'apple_ipad_ver1_sub8_subhw4',
+		'apple_ipad_ver1_sub8_subhwmini1',
+		'apple_ipad_ver1_sub8_subhwmini2',
 		
 		'apple_iphone_ver1_subhw2g',
 		'apple_iphone_ver2_subhw2g',
@@ -131,6 +139,12 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver7_1_subhw5',
 		'apple_iphone_ver7_1_subhw5c',
 		'apple_iphone_ver7_1_subhw5s',
+		'apple_iphone_ver8_subhw4s',
+		'apple_iphone_ver8_subhw5',
+		'apple_iphone_ver8_subhw5c',
+		'apple_iphone_ver8_subhw5s',
+		'apple_iphone_ver8_subhw6',
+		'apple_iphone_ver8_subhw6plus',
 
 		'apple_ipod_touch_ver1_subhw1',
 		'apple_ipod_touch_ver2_subhw1',
@@ -164,6 +178,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver6_1_subhw5',
 		'apple_ipod_touch_ver7_subhw5',
 		'apple_ipod_touch_ver7_1_subhw5',
+		'apple_ipod_touch_ver8_subhw5',
 	);
 	
 	// iOS hardware mappings
@@ -223,6 +238,19 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		if (preg_match('#^iOSClientSDK/\d+\.+[0-9\.]+ +?\((Mozilla.+)\)$#', $this->userAgent, $matches)) {
 			$this->userAgent->set($matches[1]);
 		}
+		
+		// Normalize iOS {Ver} style UAs
+		//Eg: Mozilla/5.0 (iPhone; U; CPU iOS 7.1.2 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Safari/528.16
+		if (preg_match("#CPU iOS \d+?\.\d+?#", $this->userAgent)) {
+			$ua = $this->userAgent->contains("iPad") ? str_replace("CPU iOS", "CPU OS", $this->userAgent): str_replace("CPU iOS", "CPU iPhone OS", $this->userAgent);
+			if (preg_match("#(CPU(?: iPhone)? OS [\d\.]+ like)#", $ua, $matches)) {
+				$versionUnderscore = str_replace(".", "_", $matches[1]);
+				$ua = str_replace(" U;", "", $ua);
+				$ua = preg_replace("#CPU(?: iPhone)? OS ([\d\.]+) like#", $versionUnderscore, $ua);
+				$this->userAgent->set($ua);  	
+			}
+		}
+	
 		// Attempt to find hardware version
 		$device_version = null;
 		if (preg_match('#(?:iPhone|iPad|iPod) ?(\d,\d)#', $this->userAgent, $matches)) {

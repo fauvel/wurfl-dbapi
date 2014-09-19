@@ -1,5 +1,27 @@
 ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 
+[2014.09.02] ScientiaMobile Database API 1.5.2.0
+- Improved detection of:
+    - Android
+    - Apple
+    - Firefox OS
+    - Internet Explorer
+    - Opera
+    - Smart TVs
+    - Tizen
+    - Ubuntu OS
+    - Windows Phone
+    - Windows RT
+- Improved existing virtual capabilities
+- Added virtual capabilities:
+    - complete_device_name : The brand_name, model_name and marketing name (if applicable)
+    - form_factor : Tablet, Smartphone, Feature Phone, Robot, Desktop, Smart-TV, Other Non-Mobile
+- Added support for iOS 8
+- Added the ability to detect sideloaded browser instead of the device with its stock browser
+
+[2014.02.28] ScientiaMobile Database API 1.5.1.1
+- Improved accuracy of is_robot
+
 [2013.12.13] ScientiaMobile Database API 1.5.1.0
 - Added support in Virtual Capabilities for:
 	- Internet Explorer 11

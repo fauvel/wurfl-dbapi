@@ -112,8 +112,8 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.5.1.0";
-	public $historical_release_version = "2.2.2";
+	public $release_version = "1.5.2.0";
+	public $historical_release_version = "2.2.4";
 	/**
 	 * The required version of PHP for this release
 	 * @var string
@@ -441,9 +441,9 @@ class TeraWurfl{
 		}
 		$_textToLog = date('r')." [".php_uname('n')." ".getmypid()."]"."[$func] ".$warn_banner . $text;
 		$logfile = $this->rootdir.TeraWurflConfig::$DATADIR.TeraWurflConfig::$LOG_FILE;
-		$_logFP = fopen($logfile, "a+");
-		fputs($_logFP, $_textToLog."\n");
-		fclose($_logFP);
+		if (is_writable($logfile)) {
+			file_put_contents($logfile, $_textToLog."\n", FILE_APPEND);
+		}
 	}
 	/**
 	 * Adds the top level properties to the capabilities array, like id and user_agent

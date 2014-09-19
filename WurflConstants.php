@@ -49,8 +49,14 @@ class WurflConstants {
 		/**** UCWEB ****/
 		'UcwebU3',
 		'UcwebU2',
+		
+		
 			
 		/**** Mobile platforms ****/
+		
+		//Windows Phone must be above Android to resolve WP 8.1 and above UAs correctly
+		'WindowsPhone',
+	
 		// Android Matcher Chain
 		'OperaMiniOnAndroid',
 		'OperaMobiOrTabletOnAndroid',
@@ -59,9 +65,10 @@ class WurflConstants {
 		'NetFrontOnAndroid',
 		'Android',
 		
+		'UbuntuTouchOS',
+		'Tizen',
 		'Apple',
 		'WindowsPhoneDesktop',
-		'WindowsPhone',
 		'NokiaOviBrowser', // must come before the Nokia matcher
 
 		/**** High workload mobile matchers ****/
@@ -121,10 +128,11 @@ class WurflConstants {
 		'DesktopApplication',
 
 		/**** Desktop Browsers ****/
+		//Opera before Chrome since Opera v15 and above say Chrome in the UA
+		'Opera',
 		'Chrome',
 		'Firefox',
 		'MSIE',
-		'Opera',
 		'Safari',
 		'Konqueror',
 
@@ -202,6 +210,7 @@ class WurflConstants {
 		'konfabulator',
 		'sony bravia',
 		'crkey',
+		'sonycebrowser',
 	);
 
 	/**

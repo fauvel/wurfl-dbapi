@@ -23,26 +23,45 @@ class WindowsRTUserAgentMatcher extends UserAgentMatcher {
 	
 	public static $constantIDs = array(
 		'generic_windows_8_rt',
+		'windows_8_rt_ver1_subos81',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-		return $httpRequest->user_agent->contains('Windows NT 6.2') && $httpRequest->user_agent->contains(' ARM;');
+		return $httpRequest->user_agent->contains('Windows NT ') && $httpRequest->user_agent->contains(' ARM;') && $httpRequest->user_agent->contains('Trident/');
 	}
 	
 	public function applyConclusiveMatch() {
 		// Example Windows 8 RT MSIE 10 UA:
 		// Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; ARM; Trident/6.0; Touch)
 		//                                                        ^ RIS Tolerance
-		$search = ' ARM;';
-		$idx = strpos($this->userAgent, $search);
-		if ($idx !== false) {
-			// Match to the end of the search string
-			return $this->risMatch($idx + strlen($search));
+		//Example Windows 8.1 RT MSIE 11 UA
+		//Mozilla/5.0 (Windows NT 6.3; ARM; Trident/7.0; Touch; rv:11.0) like Gecko
+		//																    	  ^ RIS Tolerance
+		
+		if ($this->userAgent->contains("like Gecko")) {
+			//Use this logic for MSIE 11 and above 
+			$search = ' Gecko';
+			$idx = strpos($this->userAgent, $search);
+			if ($idx !== false) {
+				// Match to the end of the search string
+				return $this->risMatch($idx + strlen($search));
+			}
+		}
+		else {
+			$search = ' ARM;';
+			$idx = strpos($this->userAgent, $search);
+			if ($idx !== false) {
+				// Match to the end of the search string
+				return $this->risMatch($idx + strlen($search));
+			}
 		}
 		return WurflConstants::NO_MATCH;
 	}
 	
 	public function applyRecoveryMatch() {
-		return 'generic_windows_8_rt';
+		if ($this->userAgent->contains("like Gecko")) {
+			return 'windows_8_rt_ver1_subos81';
+		}
+		else return 'generic_windows_8_rt';
 	}
 }
