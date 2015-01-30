@@ -76,15 +76,33 @@ class UserAgentUtils {
 			return $key;
 		}
 		$best = $tolerance;
-		$current = 0;
+		
 		$match = WurflConstants::NO_MATCH;
+
+        $needle_chars = count_chars($ua);
+
 		foreach ($devices as $testID => $testUA) {
-			$current = @levenshtein($ua, $testUA);
-			//if(strlen($ua) > 255 || strlen($testUA) > 255) echo "<pre>$ua\n$testUA</pre><hr/>";
-			if ($current <= $best) {
-				$best = $current;
-				$match = $testID;
-			}
+
+            $ua_chars = count_chars($testUA);
+            $sum = 0;
+            $can_apply_ld = true;
+
+            //Check from 32 (space) to 122 ('z')
+            for ($i = 32; $i < 122; $i++) {
+                $sum += abs($ua_chars[$i] - $needle_chars[$i]);
+                if ($sum > 2 * $tolerance) {
+                    $can_apply_ld = false;
+                    break;
+                }
+            }
+            if ($can_apply_ld === true) {
+                $current = @levenshtein($ua, $testUA);
+                //if(strlen($ua) > 255 || strlen($testUA) > 255) echo "<pre>$ua\n$testUA</pre><hr/>";
+                if ($current <= $best) {
+                    $best = $current;
+                    $match = $testID;
+                }
+            }
 		}
 		return $match;
 	}

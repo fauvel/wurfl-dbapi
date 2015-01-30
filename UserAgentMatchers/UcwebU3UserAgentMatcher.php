@@ -50,6 +50,9 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub5_subuaucweb',
 		'apple_ipad_ver1_sub6_subuaucweb',
 		'apple_ipad_ver1_sub7_subuaucweb',
+	
+		'generic_ms_phone_os8_subuaucweb',
+		'generic_ms_phone_os8_1_subuaucweb',
 	);
 
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -63,10 +66,21 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 			return WurflConstants::NO_MATCH;
 		}
 
-		// Android U3K Mobile + Tablet
-		if ($this->userAgent->contains('Android')) {
+		// Windows Phone goes before Android
+		if ($this->userAgent->contains('Windows Phone')) {
 			// Apply Version+Model--- matching normalization
-	
+			$model = WindowsPhoneUserAgentMatcher::getWindowsPhoneModel($this->userAgent);
+			$version = WindowsPhoneUserAgentMatcher::getWindowsPhoneVersion($this->userAgent);
+			if ($model !== null && $version !== null) {
+				$prefix = "$version U3WP $ucb_version $model".WurflConstants::RIS_DELIMITER;
+				$this->userAgent->set($prefix.$this->userAgent);
+				return $this->risMatch(strlen($prefix));
+			}
+		}
+		
+		// Android U3K Mobile + Tablet
+		else if ($this->userAgent->contains('Android')) {
+			// Apply Version+Model--- matching normalization
 			$model = AndroidUserAgentMatcher::getAndroidModel($this->userAgent, false);
 			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
 			if ($model !== null && $version !== null) {
@@ -78,7 +92,6 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 	
 		// iPhone U3K
 		else if ($this->userAgent->contains('iPhone;')) {
-	
 			if (preg_match('/iPhone OS (\d+)(?:_(\d+))?(?:_\d+)* like/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$prefix = "$version U3iPhone $ucb_version".WurflConstants::RIS_DELIMITER;
@@ -89,7 +102,6 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 			
 		// iPad U3K
 		else if ($this->userAgent->contains('iPad')) {
-			
 			if (preg_match('/CPU OS (\d)_?(\d)?.+like Mac.+; iPad([0-9,]+)\) AppleWebKit/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$model = $matches[3];
@@ -104,9 +116,28 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 
 
 	public function applyRecoveryMatch() {
+		
+		// Windows Phone
+		if ($this->userAgent->contains('Windows Phone')) {
+			$version = WindowsPhoneUserAgentMatcher::getWindowsPhoneVersion($this->userAgent);
+			$significant_version = explode('.', $version);
+			if ($significant_version[0] !== null) {
+				if ($significant_version[1] === 0) {
+					$deviceID = 'generic_ms_phone_os'.$significant_version[0].'_subuaucweb';	
+				}
+				else {
+					$deviceID = 'generic_ms_phone_os'.$significant_version[0].'_'.$significant_version[1].'_subuaucweb';
+				}
+				
+				if (in_array($deviceID, self::$constantIDs)) {
+					return $deviceID;
+				}
+			}
+			return 'generic_ms_phone_os8_subuaucweb';
+		}
+		
 		// Android U3K Mobile + Tablet. This will also handle UCWEB7 recovery and point it to the UCWEB generic IDs.
-		if ($this->userAgent->contains('Android')) {
-			// Apply Version+Model--- matching normalization
+		else if ($this->userAgent->contains('Android')) {
 			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
 			$significant_version = explode('.', $version);
 			if ($significant_version[0] !== null) {

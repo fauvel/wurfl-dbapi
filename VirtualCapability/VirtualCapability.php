@@ -300,7 +300,7 @@ class VirtualCapability_FormFactor extends VirtualCapability {
 			}
 		}
 
-		return 'Feature Phone';
+		return 'Other Mobile';
 	}
 }
 

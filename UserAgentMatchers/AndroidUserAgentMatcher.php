@@ -78,6 +78,11 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 			return $this->risMatch(strlen($prefix));
 		}
 		
+		//Return no match for UAs with no extractable Android version, model and that do not start with either Mozilla or Dalvik
+		if (!$this->userAgent->startsWith(array('Mozilla','Dalvik'))) {
+			return WurflConstants::NO_MATCH;
+		}
+		
 		// Standard RIS Matching
 		$tolerance = $this->userAgent->indexOfOrLength(array(' Build/', ' AppleWebKit'));
 		return $this->risMatch($tolerance);

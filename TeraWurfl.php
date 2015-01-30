@@ -112,8 +112,8 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.5.2.0";
-	public $historical_release_version = "2.2.4";
+	public $release_version = "1.5.3.0";
+	public $historical_release_version = "2.2.6";
 	/**
 	 * The required version of PHP for this release
 	 * @var string
@@ -539,8 +539,8 @@ class TeraWurfl{
 			return $deviceID;
 		}
 		// Check CatchAll if it's not already in use
-		if ($this->userAgentMatcher->matcherName()!="CatchAllUserAgentMatcher") {
-			$catchAllUserAgentMatcher = new CatchAllUserAgentMatcher($this);
+		if ($this->userAgentMatcher->matcherName()!="CatchAllRisUserAgentMatcher") {
+			$catchAllUserAgentMatcher = new CatchAllRisUserAgentMatcher($this);
 			$this->matcherHistory[] = $catchAllUserAgentMatcher->matcherName() . "(recovery)";
 			$deviceID = $catchAllUserAgentMatcher->applyRecoveryMatch($this->httpRequest);
 			if ($deviceID != WurflConstants::NO_MATCH) {
