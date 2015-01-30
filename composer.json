@@ -15,7 +15,8 @@
     "autoload": {
         "psr-0": {
             "TeraWurfl": ""
-        }
+        },
+        "classmap": ["TeraWurfl.php"]
     },
     "require-dev": {
         "phpunit/phpunit": "*",
