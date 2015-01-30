@@ -39,15 +39,14 @@ class VirtualCapability_UserAgentTool {
 	 */
 	protected function assignProperties($device) {
 		
-		//Is UA Windows Mobile? - WP before Android
+		//Is UA Windows Mobile?
 		if ($device->os->setContains($device->device_ua, 'Windows CE', 'Windows Mobile') && $device->browser->set('IE Mobile')) return $device;
 		
+		//Is UA Windows Phone OS? - WP before Android
 		if (strpos($device->device_ua, 'Windows Phone') !== false) {
-			// Is UA Windows Phone OS?
-			if ($device->os->setRegex($device->device_ua, '/Windows Phone(?: OS)? ([0-9]\.[0-9])/', 'Windows Phone', 1)) {
-				$device->browser->set('IE Mobile');
-				$device->browser->setRegex($device->device_ua, '/IEMobile\/(\d+\.\d+)/', 'IE Mobile', 1);
-				return $device;	
+			if ($device->os->setRegex($device->device_ua, '/Windows Phone(?: OS)? ([0-9]+\.[0-9])/', 'Windows Phone', 1)) {
+				if ($device->browser->setRegex($device->browser_ua, '/UCBrowser\/([0-9]+)\./', 'UC Browser', 1)) return $device;
+				if ($device->browser->setRegex($device->browser_ua, '/IEMobile\/(\d+\.\d+)/', 'IE Mobile', 1)) return $device;
 			}
 		}
 		
@@ -63,7 +62,16 @@ class VirtualCapability_UserAgentTool {
 						
 			//Is FB app?
 			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?Android.+?AppleWebKit.+FBAN/', 'FaceBook Android App', $device->os->version)) return $device;			
-
+			
+			//Is UA Opera?
+			if ($device->browser->setRegex($device->browser_ua, '/OPR\/([0-9]?[0-9])\.?/', 'Opera', 1)) return $device;
+			
+			//Is 360Browser?
+			if (strpos($device->browser_ua, 'Aphone Browser') !== false || strpos($device->browser_ua, '360browser') !== false) {
+				$device->browser->set('360 Browser', null);
+				return $device;
+			}
+			
 			//Is UA Chrome Mobile?
 			if ($device->browser->setRegex($device->browser_ua, '/Chrome\/([0-9]?[0-9])\.?/', 'Chrome Mobile', 1)) return $device;
 			
@@ -109,14 +117,18 @@ class VirtualCapability_UserAgentTool {
 			
 			//Is UA Chrome Mobile on iOS?
 			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?like Mac OS X.+?CriOS\/([0-9]+?)\.[0-9].+?Mobile\/[0-9A-Za-z]+ Safari\/[0-9A-Za-z]+\./', 
-				'Chrome Mobile iOS', 1)) return $device;
+				'Chrome Mobile on iOS', 1)) return $device;
 			
+			//Is UA Opera Mini on iOS?
+			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?like Mac OS X.+?OPiOS\/([0-9]+?)\.[0-9].+?Mobile\/[0-9A-Za-z]+ Safari\/[0-9A-Za-z]+\./', 
+				'Opera Mini on iOS', 1)) return $device;
+				
 			//Is UA UC Web Browser?
 			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?like Mac OS X.+?AppleWebKit.+?Mobile\/[0-9A-Za-z]+ Safari\/[0-9A-Za-z]+.*UCBrowser\/?([0-9]+)\./', 
 				'UC Web Browser on iOS', 1)) return $device;
 
 			//Is UA Mobile iOS Safari?
-			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?like Mac OS X.+?AppleWebKit.+?Mobile\/[0-9A-Za-z]+.*FBAN/', 'FaceBook app on iPhone', 
+			if ($device->browser->setRegex($device->browser_ua, '/^Mozilla\/[45]\.0.+?like Mac OS X.+?AppleWebKit.+?Mobile\/[0-9A-Za-z]+.*FBAN/', 'FaceBook on iOS', 
 				$device->os->version)) return $device;
 
 			//Catchall for all other iOS UAs including Mobile Safari
@@ -235,26 +247,49 @@ class VirtualCapability_UserAgentTool {
 		
 		
 		// Desktop Browsers
+
+		//360 Browser
+		if ((strpos($device->device_ua, '360Browser') !== false || strpos($device->device_ua, ' 360SE') !== false) && $device->os->setRegex($device->device_ua, '/^Mozilla\/[0-9]\.0 .+?((?:Windows|Linux|PPC|Intel) [a-zA-Z0-9 _\.\-]+).+(?:360Browser|360SE)/', 1)) {
+			$device->browser->set('360 Browser', null);
+			return $device;
+		}
 		
-		//MSIE 
-		if (strpos($device->device_ua, 'Trident') !== false) {
-			//MSIE 10 and below
+		//MSIE - If UA says MSIE
+		if (strpos($device->device_ua, 'MSIE') !== false) {
 			if ($device->os->setRegex($device->device_ua, '/^Mozilla\/[0-9]\.0 \(compatible; MSIE ([0-9][0-9]?\.[0-9][0-9]?); ((?:Windows NT [0-9]\.[0-9])|(?:Windows [0-9]\.[0-9])|(?:Windows [0-9]+)|(?:Mac_PowerPC))/', 2)) {
 				$device->browser->set('IE', $device->os->getLastRegexMatch(1));
 				return $device;
 			}
-			
-			//MSIE 11 and above
-			else if ($device->os->setRegex($device->device_ua, '#^Mozilla/[45]\.0 \((Windows NT [0-9]\.[0-9]);.+Trident.+; rv:([0-9]+)\.[0-9]+#', 1)) {
+		}
+		
+		//MSIE - If UA says Trident 
+		if (strpos($device->device_ua, 'Trident') !== false) {
+			//MSIE 11 does not say MSIE and needs this
+			if ($device->os->setRegex($device->device_ua, '#^Mozilla/[45]\.0 \((Windows NT [0-9]\.[0-9]);.+Trident.+; rv:([0-9]+)\.[0-9]+#', 1)) {
 				$device->browser->set('IE', $device->os->getLastRegexMatch(2));
 				return $device;
 			}
 		}
-		
+	
 		//Yandex Browser
 		if (strpos($device->device_ua, 'YaBrowser') !== false 
 			&& $device->os->setRegex($device->device_ua, '/^Mozilla\/[45]\.[0-9] \((?:Macintosh; )?([a-zA-Z0-9\._ ]+)\) AppleWebKit.+YaBrowser\/([0-9]?[0-9]\.[0-9])/', 1)) {
 			$device->browser->set('Yandex browser', $device->os->getLastRegexMatch(2));
+			return $device;
+		}
+		
+		//Opera - OPR
+		if (strpos($device->device_ua, 'OPR') !== false 
+			&& $device->os->setRegex($device->device_ua, '/^Mozilla\/[0-9]\.0 .+?((?:Windows|Linux|PPC|Intel) [a-zA-Z0-9 _\.\-]+).+Chrome\/.+OPR\/([0-9]+?)\./', 1)) {
+			$device->browser->set('Opera', $device->os->getLastRegexMatch(2));
+			return $device;
+		}
+		
+		//Opera - Old UA
+		if (strpos($device->device_ua, 'Opera') !== false 
+			&& $device->os->setRegex($device->device_ua, '/^Opera\/([0-9]?[0-9]\.[0-9][0-9]?) .+?((?:Windows|Linux|PPC|Intel) [a-zA-Z0-9 _\.\-]+) ?;/', 2)) {
+			$device->browser->set('Opera', $device->os->getLastRegexMatch(1));
+			$device->browser->setRegex($device->browser_ua, '/^Opera\/.+? Version\/([0-9]?[0-9]\.[0-9][0-9]?)/', null, 1);
 			return $device;
 		}
 		
@@ -292,15 +327,7 @@ class VirtualCapability_UserAgentTool {
 				return $device;
 			}
 		}
-		
-		//Opera
-		if (strpos($device->device_ua, 'Opera') !== false 
-			&& $device->os->setRegex($device->device_ua, '/^Opera\/([0-9]?[0-9]\.[0-9][0-9]?) .+?((?:Windows|Linux|PPC|Intel) [a-zA-Z0-9 _\.\-]+) ?;/', 2)) {
-			$device->browser->set('Opera', $device->os->getLastRegexMatch(1));
-			$device->browser->setRegex($device->browser_ua, '/^Opera\/.+? Version\/([0-9]?[0-9]\.[0-9][0-9]?)/', null, 1);
-			return $device;
-		}
-		
+
 		return $device;
 	}
 	
@@ -349,6 +376,8 @@ class VirtualCapability_UserAgentTool_Device {
 		'6.1' => '7',
 		'6.2' => '8',
 		'6.3' => '8.1',
+		'6.4' => '10',
+		'10.0' => '10',
 	);
 	
 	public function normalize() {
@@ -356,7 +385,7 @@ class VirtualCapability_UserAgentTool_Device {
 	}
 	protected function normalizeOS() {
 		if (strpos($this->device_ua, 'Windows') !== false) {
-			if (preg_match('/Windows NT ([0-9]\.[0-9])/', $this->os->name, $matches)) {
+			if (preg_match('/Windows NT ([0-9]+?\.[0-9])/', $this->os->name, $matches)) {
 				$this->os->name = "Windows";
 				$this->os->version = array_key_exists($matches[1], self::$windows_map)? self::$windows_map[$matches[1]]: $matches[1];
 				return;
