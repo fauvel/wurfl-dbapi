@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -39,12 +39,7 @@ class SamsungUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyRecoveryMatch() {
-		if ($this->userAgent->startsWith('SAMSUNG')) {
-			$tolerance = 8;
-			return $this->ldMatch($tolerance);
-		} else {
-			$tolerance = $this->userAgent->indexOfOrLength('/', $this->userAgent->indexOf('Samsung'));
-			return $this->risMatch($tolerance);
-		}
+        $tolerance = $this->userAgent->indexOfOrLength('/', $this->userAgent->indexOf('Samsung'));
+        return $this->risMatch($tolerance);
 	}
 }

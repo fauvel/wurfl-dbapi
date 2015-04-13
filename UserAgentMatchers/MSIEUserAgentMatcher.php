@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -34,6 +34,7 @@ class MSIEUserAgentMatcher extends UserAgentMatcher {
 		9     => 'msie_9',
 		10    => 'msie_10',
 		11    => 'msie_11',
+		12    => 'msie_12',
 	);
 	
 	
@@ -45,17 +46,21 @@ class MSIEUserAgentMatcher extends UserAgentMatcher {
 			return false;
 		}
 		
+		// Edge 12 signature
+		$has_edge_mode = $httpRequest->user_agent->contains(' Edge/');
 		// IE 11 signature
 		$has_trident_rv = ($httpRequest->user_agent->contains('Trident') && $httpRequest->user_agent->contains('rv:'));
 		// IE < 11 signature
 		$has_msie = $httpRequest->user_agent->contains('MSIE');
-		return ($has_msie || $has_trident_rv);
+		return ($has_msie || $has_trident_rv || $has_edge_mode);
 	}
 	
 	public function applyConclusiveMatch() {
 		$matches = array();
-		if (preg_match('/^Mozilla\/5\.0 \(.+?Trident.+?; rv:(\d\d)\.(\d+)\)/', $this->userAgent, $matches)
-			|| preg_match('/^Mozilla\/[45]\.0 \(compatible; MSIE (\d+)\.(\d+);/', $this->userAgent, $matches)) {
+		//Edge || MSIE 11 (rv: UA) || Legacy UA
+		 
+		if (preg_match('#^Mozilla/5\.0 \(Windows NT.+? Edge/(\d+)\.(\d+)#', $this->userAgent, $matches) || preg_match('#^Mozilla/5\.0 \(.+?Trident.+?; rv:(\d\d)\.(\d+)\)#', $this->userAgent, $matches)
+			|| preg_match('#^Mozilla/[45]\.0 \(compatible; MSIE (\d+)\.(\d+);#', $this->userAgent, $matches)) {
 			
 			$major = (int)$matches[1];
 			$minor = (int)$matches[2];

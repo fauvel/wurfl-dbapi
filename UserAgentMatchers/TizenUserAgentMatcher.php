@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,6 +27,7 @@ class TizenUserAgentMatcher extends UserAgentMatcher {
 		'generic_tizen_ver2_0',
 		'generic_tizen_ver2_1',
 		'generic_tizen_ver2_2',
+		'generic_tizen_ver2_3',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -49,7 +50,7 @@ class TizenUserAgentMatcher extends UserAgentMatcher {
 	
 	public function applyRecoveryMatch() {
 	
-		$version = self::getTizenVersion($this->userAgent); 
+		$version = self::getTizenVersion($this->userAgent);
 		$version = "generic_tizen_ver".str_replace(".", "_", $version);
 		if (in_array($version, self::$constantIDs)) {
 			return $version;
@@ -57,7 +58,7 @@ class TizenUserAgentMatcher extends UserAgentMatcher {
 		return "generic_tizen";
 	}
 	
-	public static $validTizenVersions = array('1.0', '2.0', '2.1', '2.2');
+	public static $validTizenVersions = array('1.0', '2.0', '2.1', '2.2', '2.3');
 	
 	public static function getTizenVersion($ua) {
 		

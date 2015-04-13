@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,11 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		'generic_android_ver4_4',
 		'generic_android_ver4_5',
 		'generic_android_ver5_0',
+		'generic_android_ver5_1',
+		'generic_android_ver5_2',
+		'generic_android_ver5_3',
+		'generic_android_ver6_0',
+
 
 		'generic_android_ver1_5_tablet',
 		'generic_android_ver1_6_tablet',
@@ -61,6 +66,10 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		'generic_android_ver4_4_tablet',
 		'generic_android_ver4_5_tablet',
 		'generic_android_ver5_0_tablet',
+		'generic_android_ver5_1_tablet',
+		'generic_android_ver5_2_tablet',
+		'generic_android_ver5_3_tablet',
+		'generic_android_ver6_0_tablet',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -122,7 +131,7 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 	/********* Android Utility Functions ***********/
 	const ANDROID_DEFAULT_VERSION = 2.0;
 	
-	public static $validAndroidVersions = array('1.0', '1.5', '1.6', '2.0', '2.1', '2.2', '2.3', '2.4', '3.0', '3.1', '3.2', '3.3', '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '5.0');
+	public static $validAndroidVersions = array('1.0', '1.5', '1.6', '2.0', '2.1', '2.2', '2.3', '2.4', '3.0', '3.1', '3.2', '3.3', '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '5.0', '5.1', '5.2', '5.3', '6.0');
 	public static $androidReleaseMap = array(
 		'Cupcake' => '1.5',
 		'Donut' => '1.6',
@@ -173,7 +182,6 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 	public static function getAndroidModel($ua, $use_default=true) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
-		
 		// Different logic for Mozillite and non-Mozillite UAs to isolate model name
 		// Non-Mozillite UAs get first preference
 		if (preg_match('#(^[A-Za-z0-9_\-\+ ]+)[/ ]?(?:[A-Za-z0-9_\-\+\.]+)? +Linux/[0-9\.]+ +Android[ /][0-9\.]+ +Release/[0-9\.]+#', $ua, $matches)) {
@@ -185,9 +193,13 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 			// Trim off spaces and semicolons
 			$model = rtrim($matches[1], ' ;');
 			
+		// Additional logic to capture model names in Amazon webview/appstore UAs
+		} else if (preg_match('#^(?:AmazonWebView|Appstore|Amazon\.com)/.+Android[/ ][\d\.]+/(?:[\d]+/)?([A-Za-z0-9_\- ]+)\b#', $ua, $matches)) {
+			$model = $matches[1];
 		} else {
 			return null;
 		}
+		
 		
 		// The previous RegEx may return just "Build/.*" for UAs like:
 		// HTC_Dream Mozilla/5.0 (Linux; U; Android 1.5; xx-xx; Build/CUPCAKE) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
