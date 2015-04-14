@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -30,6 +30,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		'generic_ms_phone_os7_8',
 		'generic_ms_phone_os8',
 		'generic_ms_phone_os8_1',
+		'generic_ms_phone_os10',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -62,6 +63,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		
 		$version = self::getWindowsPhoneVersion($this->userAgent);
 		
+		if ($version == "10.0")return 'generic_ms_phone_os10';
 		if ($version == "8.1") return 'generic_ms_phone_os8_1';
 		if ($version == "8.0") return 'generic_ms_phone_os8';
 		if ($version == "7.8") return 'generic_ms_phone_os7_8';
@@ -80,7 +82,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
 		// This regex is relatively fast because there is not much backtracking, and almost all UAs will match
-		if (preg_match('|IEMobile/\d+\.\d+;(?: ARM;)?(?: Touch;)? ?([^;\)]+(; ?[^;\)]+)?)|', $ua, $matches)) {
+		if (preg_match('|IEMobile/\d+\.\d+;(?: ARM;)?(?: Touch;)? ?([^;\)]+(; ?[^;\)]+)?)|', $ua, $matches) || preg_match('|Android [\d\.]+?; ([^;\)]+(; ?[^;\)]+)?).+?Edge/\d|', $ua, $matches)) {
 			$model = $matches[1];
 
 			// Some UAs contain "_blocked" and that string causes matching errors:
@@ -123,7 +125,9 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		
 	public static function getWindowsPhoneVersion($ua) {
 		if (preg_match('|Windows ?Phone(?: ?OS)? ?(\d+\.\d+)|', $ua, $matches)) {
-			if (strpos($matches[1], "6.3") !== false || strpos($matches[1], "8.1") !== false) {
+			if (strpos($matches[1], "10.0") !== false) {
+				return '10.0';
+			} else if (strpos($matches[1], "6.3") !== false || strpos($matches[1], "8.1") !== false) {
 				return '8.1';
 			} else if (strpos($matches[1], "8.") !== false) {
 				return '8.0';

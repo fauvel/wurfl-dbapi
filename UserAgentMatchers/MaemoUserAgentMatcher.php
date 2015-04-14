@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -40,8 +40,8 @@ class MaemoUserAgentMatcher extends UserAgentMatcher {
 			$this->userAgent->set($prefix.$this->userAgent);
 			return $this->risMatch(strlen($prefix));
 		}
-		
-		return $this->ldMatch(7);
+
+        return $this->risMatch($this->userAgent->firstSlash());
 	}
 
 	public function applyRecoveryMatch() {

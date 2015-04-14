@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,9 +27,6 @@ class NecUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
-		if ($this->userAgent->startsWith('NEC')) {
-			return $this->risMatch($this->userAgent->firstSlash());
-		}
-		return $this->ldMatch(2);
+		return $this->risMatch($this->userAgent->firstSlash());
 	}
 }

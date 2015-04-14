@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -38,8 +38,14 @@ class CatchAllMozillaUserAgentMatcher extends UserAgentMatcher {
     public function applyConclusiveMatch() {
         $this->match_type = 'conclusive';
 
-        $deviceID = $this->ldMatch(5);
-        if ($deviceID != WurflConstants::NO_MATCH) $this->match = true;
-        return $deviceID;
+        if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE === true) {
+            //High performance mode
+            return $this->risMatch($this->userAgent->firstCloseParen());
+        } else {
+            //High accuracy mode
+            $deviceID = $this->ldMatch(5);
+            if ($deviceID != WurflConstants::NO_MATCH) $this->match = true;
+            return $deviceID;
+        }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -112,8 +112,8 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.5.3.0";
-	public $historical_release_version = "2.2.6";
+	public $release_version = "1.6.0.0";
+	public $historical_release_version = "2.3.0";
 	/**
 	 * The required version of PHP for this release
 	 * @var string

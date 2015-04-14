@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,11 +27,6 @@ class VodafoneUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
-		$tolerance = $this->userAgent->firstSlash();
-		$match = $this->risMatch($tolerance);
-		if ($match == WurflConstants::NO_MATCH) {
-			return $this->ldMatch();
-		}
-		return $match;
+		return $this->risMatch($this->userAgent->firstSlash());
 	}
 }

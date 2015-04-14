@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -517,11 +517,11 @@ ORDER BY parent.`rt`",
 		}
 	}
 	public function createProcedures(){
-		$TeraWurfl_RIS = "CREATE PROCEDURE `".TeraWurflConfig::$TABLE_PREFIX."_RIS`(IN ua VARCHAR(255), IN tolerance INT, IN matcher VARCHAR(64))
+		$TeraWurfl_RIS = "CREATE PROCEDURE `".TeraWurflConfig::$TABLE_PREFIX."_RIS`(IN ua VARCHAR(300), IN tolerance INT, IN matcher VARCHAR(64))
 BEGIN
 DECLARE curlen INT;
 DECLARE wurflid ".self::$WURFL_ID_COLUMN_TYPE."(".self::$WURFL_ID_MAX_LENGTH.") DEFAULT NULL;
-DECLARE curua VARCHAR(255);
+DECLARE curua VARCHAR(300);
 
 SELECT CHAR_LENGTH(ua)  INTO curlen;
 findua: WHILE ( curlen >= tolerance ) DO

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -252,13 +252,21 @@ class TeraWurflHttpRequestHeader {
 		return ($position !== false)? $position: strlen($this->_normalized);
 	}
 	/**
-	 * The character position of the first open parenthisis.  If there are no open parenthisis, returns string length
+	 * The character position of the first open parenthesis.  If there are no open parenthesis, returns string length
 	 * @return int Character position
 	 */
 	public function firstOpenParen() {
 		$position = strpos($this->_normalized, '(');
 		return ($position !== false)? $position: strlen($this->_normalized);
 	}
+    /**
+     * The character position of the first close parenthesis.  If there are no close parenthesis, returns string length
+     * @return int Character position
+     */
+    public function firstCloseParen() {
+        $position = strpos($this->_normalized, ')');
+        return ($position !== false)? $position: strlen($this->_normalized);
+    }
 	/**
 	 * Returns the character position of the $target string, starting from $startingIndex
 	 * @param string $target
