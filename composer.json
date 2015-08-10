@@ -1,10 +1,9 @@
 {
     "name": "wurfl/wurfl-dbapi",
     "description": "The WURFL OnSite DB API",
-    "license": "GNU AFFERO GENERAL PUBLIC LICENSE",
-    "description": "WURFL, the Wireless Universal Resource FiLe, is a Device Description Repository (DDR), i.e. a software component that maps HTTP Request headers to the profile of the HTTP client (Desktop, Mobile Device, Tablet, etc.) that issued the request",
+    "license": "AGPLv3",
     "homepage": "http://wurfl.sourceforge.net/",
-    "version": "1.5.3.0",
+    "version": "1.6.1.0",
     "authors": [
         {
             "name": "ScientiaMobile, Inc",
