@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,11 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 		'opera_23',
 		'opera_24',
 		'opera_25',
+		'opera_26',
+		'opera_27',
+		'opera_28',
+		'opera_29',
+		'opera_30',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,9 @@ require_once realpath(dirname(__FILE__).'/TeraWurflUserAgentProfile.php');
  * @property TeraWurflHttpRequestHeader $accept
  */
 class TeraWurflHttpRequest {
-	
+
+    const MAX_HTTP_HEADER_LENGTH = 255;
+
 	/**
 	 * The order in which HTTP Headers are searched to find the proper User Agent
 	 * @var array
@@ -148,6 +150,9 @@ class TeraWurflHttpRequest {
 			if (strpos($name, 'HTTP_') !== 0 && !is_scalar($value)) {
 				continue;
 			}
+            if (strlen($value) > self::MAX_HTTP_HEADER_LENGTH) {
+                $value = substr($value,0,self::MAX_HTTP_HEADER_LENGTH);
+            }
 			if (in_array($name, $this->_user_agent_search_order)) {
 				$this->_http_headers[$name] = new TeraWurflUserAgent($name, $value);
 				continue;
@@ -159,7 +164,7 @@ class TeraWurflHttpRequest {
 			$this->_http_headers[$name] = new TeraWurflHttpRequestHeader($name, $value);
 		}
 	}
-	
+
 	/**
 	 * Finds the correct User Agent Header for WURFL Matching and stores its key
 	 */

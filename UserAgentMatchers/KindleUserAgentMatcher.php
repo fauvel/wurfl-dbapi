@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -33,6 +33,10 @@ class KindleUserAgentMatcher extends UserAgentMatcher {
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
+		
+		if ($httpRequest->user_agent->contains("Android") && $httpRequest->user_agent->contains("/Kindle")) {
+			return false;
+		}
 		return $httpRequest->user_agent->contains(array('Kindle', 'Silk'));
 	}
 	

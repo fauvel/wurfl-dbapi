@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -44,15 +44,20 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver5_subuaucweb',
 		'apple_iphone_ver6_subuaucweb',
 		'apple_iphone_ver7_subuaucweb',
+		'apple_iphone_ver8_subuaucweb',
+		'apple_iphone_ver9_subuaucweb',
 		
 		'apple_ipad_ver1_subuaucweb',
 		'apple_ipad_ver1_sub4_subuaucweb',
 		'apple_ipad_ver1_sub5_subuaucweb',
 		'apple_ipad_ver1_sub6_subuaucweb',
 		'apple_ipad_ver1_sub7_subuaucweb',
+		'apple_ipad_ver1_sub8_subuaucweb',
+		'apple_ipad_ver1_sub9_subuaucweb',
 	
 		'generic_ms_phone_os8_subuaucweb',
 		'generic_ms_phone_os8_1_subuaucweb',
+		'generic_ms_phone_os10_subuaucweb',
 	);
 
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {

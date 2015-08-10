@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -37,7 +37,8 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver6',
 		'apple_ipod_touch_ver7',
 		'apple_ipod_touch_ver8',
-	
+		'apple_ipod_touch_ver9',
+				
 		'apple_ipad_ver1',
 		'apple_ipad_ver1_subua32',
 		'apple_ipad_ver1_sub42',
@@ -45,7 +46,8 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub6',
 		'apple_ipad_ver1_sub7',
 		'apple_ipad_ver1_sub8',
-	
+		'apple_ipad_ver1_sub9',
+				
 		'apple_iphone_ver1',
 		'apple_iphone_ver2',
 		'apple_iphone_ver3',
@@ -54,6 +56,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver6',
 		'apple_iphone_ver7',
 		'apple_iphone_ver8',
+		'apple_iphone_ver9',
 	
 		//iOS HW IDs
 		'apple_ipad_ver1_subhw1',
@@ -106,7 +109,31 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub8_2_subhwair2',
 		'apple_ipad_ver1_sub8_2_subhwmini1',
 		'apple_ipad_ver1_sub8_2_subhwmini2',
-		'apple_ipad_ver1_sub8_2_subhwmini3',	
+		'apple_ipad_ver1_sub8_2_subhwmini3',
+		'apple_ipad_ver1_sub8_3_subhw2',
+		'apple_ipad_ver1_sub8_3_subhw3',
+		'apple_ipad_ver1_sub8_3_subhw4',
+		'apple_ipad_ver1_sub8_3_subhwair',
+		'apple_ipad_ver1_sub8_3_subhwair2',
+		'apple_ipad_ver1_sub8_3_subhwmini1',
+		'apple_ipad_ver1_sub8_3_subhwmini2',
+		'apple_ipad_ver1_sub8_3_subhwmini3',
+		'apple_ipad_ver1_sub8_4_subhw2',
+		'apple_ipad_ver1_sub8_4_subhw3',
+		'apple_ipad_ver1_sub8_4_subhw4',
+		'apple_ipad_ver1_sub8_4_subhwair',
+		'apple_ipad_ver1_sub8_4_subhwair2',
+		'apple_ipad_ver1_sub8_4_subhwmini1',
+		'apple_ipad_ver1_sub8_4_subhwmini2',
+		'apple_ipad_ver1_sub8_4_subhwmini3',
+		'apple_ipad_ver1_sub9_subhw2',
+		'apple_ipad_ver1_sub9_subhw3',
+		'apple_ipad_ver1_sub9_subhw4',
+		'apple_ipad_ver1_sub9_subhwair',
+		'apple_ipad_ver1_sub9_subhwair2',
+		'apple_ipad_ver1_sub9_subhwmini1',
+		'apple_ipad_ver1_sub9_subhwmini2',
+		'apple_ipad_ver1_sub9_subhwmini3',
 		
 		'apple_iphone_ver1_subhw2g',
 		'apple_iphone_ver2_subhw2g',
@@ -180,6 +207,24 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver8_2_subhw5s',
 		'apple_iphone_ver8_2_subhw6',
 		'apple_iphone_ver8_2_subhw6plus',
+		'apple_iphone_ver8_3_subhw4s',
+		'apple_iphone_ver8_3_subhw5',
+		'apple_iphone_ver8_3_subhw5c',
+		'apple_iphone_ver8_3_subhw5s',
+		'apple_iphone_ver8_3_subhw6',
+		'apple_iphone_ver8_3_subhw6plus',
+		'apple_iphone_ver8_4_subhw4s',
+		'apple_iphone_ver8_4_subhw5',
+		'apple_iphone_ver8_4_subhw5c',
+		'apple_iphone_ver8_4_subhw5s',
+		'apple_iphone_ver8_4_subhw6',
+		'apple_iphone_ver8_4_subhw6plus',
+		'apple_iphone_ver9_subhw4s',
+		'apple_iphone_ver9_subhw5',
+		'apple_iphone_ver9_subhw5c',
+		'apple_iphone_ver9_subhw5s',
+		'apple_iphone_ver9_subhw6',
+		'apple_iphone_ver9_subhw6plus',
 
 		'apple_ipod_touch_ver1_subhw1',
 		'apple_ipod_touch_ver2_subhw1',
@@ -216,6 +261,9 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver8_subhw5',
 		'apple_ipod_touch_ver8_1_subhw5',
 		'apple_ipod_touch_ver8_2_subhw5',
+		'apple_ipod_touch_ver8_3_subhw5',
+		'apple_ipod_touch_ver8_4_subhw5',
+		'apple_ipod_touch_ver9_subhw5',
 	);
 	
 	// iOS hardware mappings
@@ -275,11 +323,33 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return ($httpRequest->user_agent->contains('Mozilla/5') && $httpRequest->user_agent->contains(array('iPhone', 'iPod', 'iPad')));
+		return ($httpRequest->user_agent->contains(array('iPhone', 'iPod', 'iPad')));
 	}
 	
 	public function applyConclusiveMatch() {
 		
+		//Normalize AFNetworking and server-bag UAs
+		//Pippo/2.4.3 (iPad; iOS 8.0.2; Scale/2.00)
+		//server-bag [iPhone OS,8.2,12D508,iPhone4,1]
+		//iPhone4,1/8.2 (12D508)		
+		if ( preg_match('#^[^/]+?/[\d\.]+? \(i[A-Za-z]+; iOS ([\d\.]+); Scale/[\d\.]+\)#', $this->userAgent, $matches) 
+				|| preg_match('#^server-bag \[iPhone OS,([\d\.]+),#', $this->userAgent, $matches)
+				|| preg_match('#^i(?:Phone|Pad|Pod)\d+?,\d+?/([\d\.]+)#', $this->userAgent, $matches)) {
+			$matches[1] = str_replace(".", "_", $matches[1]);
+			if ($this->userAgent->contains("iPad")) {
+				$this->userAgent->set("Mozilla/5.0 (iPad; CPU OS {$matches[1]} like Mac OS X) AppleWebKit/538.39.2 (KHTML, like Gecko) Version/7.0 Mobile/12A4297e Safari/9537.53 ".$this->userAgent);
+			
+			} else if ($this->userAgent->contains("iPod touch")) {
+				$this->userAgent->set("Mozilla/5.0 (iPod touch; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/538.41 (KHTML, like Gecko) Version/7.0 Mobile/12A307 Safari/9537.53 ".$this->userAgent);
+			
+			} else if ($this->userAgent->contains("iPod")) {
+				$this->userAgent->set("Mozilla/5.0 (iPod; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/538.41 (KHTML, like Gecko) Version/7.0 Mobile/12A307 Safari/9537.53 ".$this->userAgent);
+			
+			} else {
+				$this->userAgent->set("Mozilla/5.0 (iPhone; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/601.1.10 (KHTML, like Gecko) Version/8.0 Mobile/12E155 Safari/600.1.4 ".$this->userAgent);
+			}
+		}
+
 		// Normalize Skype SDK UAs
 		if (preg_match('#^iOSClientSDK/\d+\.+[0-9\.]+ +?\((Mozilla.+)\)$#', $this->userAgent, $matches)) {
 			$this->userAgent->set($matches[1]);
@@ -355,6 +425,12 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 			$major_version = -1;
 			$minor_version = -1;
 		}
+		
+		// Core-media
+		if ($this->userAgent->contains('CoreMedia')) {
+			return 'apple_iphone_coremedia_ver1';
+		}
+		
 		// Check iPods first since they also contain 'iPhone'
 		if ($this->userAgent->contains('iPod')) {
 			$deviceID = 'apple_ipod_touch_ver'.$major_version;

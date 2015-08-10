@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -284,8 +284,8 @@ class TeraWurflLoader{
 	 * @return bool Success
 	 */
 	public function loadPatches(){
-		if(!TeraWurflConfig::$PATCH_ENABLE) return true;
 		$this->timepatch = microtime(true);
+		if(!TeraWurflConfig::$PATCH_ENABLE) return true;
 		// Explode the patchfile string into an array of patch files (normally just one file)
 		$patches = explode(';',TeraWurflConfig::$PATCH_FILE);
 		foreach($patches as $patch){

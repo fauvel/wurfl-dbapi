@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -32,10 +32,7 @@ class MotorolaUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
-		if ($this->userAgent->startsWith(array('Mot-', 'MOT-', 'Motorola'))) {
-			return $this->risMatch($this->userAgent->firstSlash());
-		}
-		return $this->ldMatch(5);
+		return $this->risMatch($this->userAgent->firstSlash());
 	}
 	public function applyRecoveryMatch() {
 		if ($this->userAgent->contains(array('MIB/2.2', 'MIB/BER2.2'))) {

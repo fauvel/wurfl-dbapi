@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,12 +27,6 @@ class PantechUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
-		if ($this->userAgent->startsWith('Pantech') || $this->userAgent->startsWith('PANTECH')) {
-			$result = $this->ldMatch(5);
-			if ($result !== WurflConstants::NO_MATCH) {
-				return $result;
-			}
-		}
 		return $this->risMatch($this->userAgent->firstSlash());
 	}
 }

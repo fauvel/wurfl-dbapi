@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -68,7 +68,6 @@ class WurflConstants {
 		'UbuntuTouchOS',
 		'Tizen',
 		'Apple',
-		'WindowsPhoneDesktop',
 		'NokiaOviBrowser', // must come before the Nokia matcher
 
 		/**** High workload mobile matchers ****/
@@ -128,11 +127,12 @@ class WurflConstants {
 		'DesktopApplication',
 
 		/**** Desktop Browsers ****/
+		//MSIE above Chrome/Opera after MSIE 12+ say Chrome
+		'MSIE',
 		//Opera before Chrome since Opera v15 and above say Chrome in the UA
 		'Opera',
 		'Chrome',
 		'Firefox',
-		'MSIE',
 		'Safari',
 		'Konqueror',
 
@@ -203,7 +203,6 @@ class WurflConstants {
 		'smarttv',
 		'smart-tv',
 		'dlna',
-		'netcast.tv',
 		'ce-html',
 		'inettvbrowser',
 		'opera tv',
@@ -212,6 +211,10 @@ class WurflConstants {
 		'sony bravia',
 		'crkey',
 		'sonycebrowser',
+		'hbbtv',
+		'large screen',
+		'netcast',
+		'philipstv',
 	);
 
 	/**
@@ -243,6 +246,7 @@ class WurflConstants {
 		'yahoo! searchmonkey',
 		'yahoo! slurp',
 		'feedfetcher-google',
-		'mowser'
+		'mowser',
+		'trove',
 	);
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2014 ScientiaMobile, Inc.
+ * Copyright (c) 2015 ScientiaMobile, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -40,6 +40,9 @@ class SimpleDesktopUserAgentMatcher extends UserAgentMatcher {
 		if ($httpRequest->uaprof instanceof TeraWurflUserAgentProfile && $httpRequest->uaprof->containsValidUrl()) return false;
 		// Check Smart TV keywords
 		if ($user_agent->iContains(WurflConstants::$SMARTTV_BROWSERS)) return false;
+		//WP Desktop - Edge Mode
+		if ($user_agent->contains('Mozilla/5.0 (Windows NT ') && $user_agent->contains(' ARM;') && $user_agent->contains(' Edge/')) return false;
+		
 		// Chrome
 		if ($user_agent->contains('Chrome') && !$user_agent->contains(array('Android', 'Ventana'))) return true;
 		// Check mobile keywords
