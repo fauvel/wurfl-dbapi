@@ -45,7 +45,7 @@ require_once realpath(dirname(__FILE__).'/VirtualCapability/VirtualCapabilityPro
 /**
  * The main Tera-WURFL Class, provides all end-user methods and properties for interacting
  * with Tera-WURFL
- * 
+ *
  * @package TeraWurfl
  */
 class TeraWurfl{
@@ -102,7 +102,7 @@ class TeraWurfl{
 	 * @var boolean
 	 */
 	public $foundInCache;
-	
+
 	/**
 	 * The installed branch of Tera-WURFL
 	 * @var string
@@ -119,7 +119,7 @@ class TeraWurfl{
 	 * @var string
 	 */
 	public static $required_php_version = "5.1.0";
-	
+
 	/**
 	 * Lookup start time
 	 * @var int
@@ -152,12 +152,12 @@ class TeraWurfl{
 	 * @var int
 	 */
 	protected $maxDeviceDepth = 40;
-	
+
 	/**
 	 * @var VirtualCapabilityProvider
 	 */
 	public $virtual_cap_provider;
-	
+
 	/**
      * Instatiate a new TeraWurfl object
      */
@@ -173,7 +173,7 @@ class TeraWurfl{
 			throw new TeraWurflDatabaseException("Cannot connect to database: ".$this->db->getLastError());
 		}
 	}
-	
+
 	/**
 	 * Detects the capabilities of a device from a given user agent and optionally, the HTTP Accept Headers
 	 * @param string $userAgent HTTP User Agent
@@ -291,14 +291,14 @@ class TeraWurfl{
 			/**
 			 * This loop starts with the best-matched device, and follows its fall_back until it reaches the GENERIC device
 			 * Lets use "tmobile_shadow_ver1" for an example:
-			 * 
+			 *
 			 * 'id' => 'tmobile_shadow_ver1', 'fall_back' => 'ms_mobile_browser_ver1'
 			 * 'id' => 'ms_mobile_browser_ver1', 'fall_back' => 'generic_xhtml'
 			 * 'id' => 'generic_xhtml', 'fall_back' => 'generic'
 			 * 'id' => 'generic', 'fall_back' => 'root'
-			 * 
+			 *
 			 * This fallback_tree in this example contains 4 elements in the order shown above.
-			 * 
+			 *
 			 */
 			while ($currentDevice['fall_back'] != "root") {
 				$currentDevice = $this->db->getDeviceFromID($currentDevice['fall_back']);
@@ -331,7 +331,7 @@ class TeraWurfl{
 			/**
 			 * Merge the device capabilities from the parent (GENERIC) to the child (DeviceID)
 			 * We merge in this order because the GENERIC device contains all the properties that can be set
-			 * Then the next child modifies them, then the next child, and the next child, etc... 
+			 * Then the next child modifies them, then the next child, and the next child, etc...
 			 */
 			while (count($fallbackTree)>0) {
 				$dev = array_pop($fallbackTree);
@@ -383,7 +383,7 @@ class TeraWurfl{
 	public function fullTableName() {
 		return TeraWurflConfig::$TABLE_PREFIX.'_'.$this->userAgentMatcher->tableSuffix();
 	}
-	
+
 	/**
 	 * Prints the contents of the API's UserAgentMatcher buckets
 	 */
@@ -393,11 +393,11 @@ class TeraWurfl{
 		if (!($this->httpRequest instanceof TeraWurflHttpRequest)) {
 			$this->httpRequest = new TeraWurflHttpRequest(array('HTTP_USER_AGENT' => 'debug'));
 		}
-		
+
 		// Setup WurflNodes
 		$wurfl_file = $this->rootdir.TeraWurflConfig::$DATADIR.TeraWurflConfig::$WURFL_FILE;
 		$map->load($wurfl_file);
-		
+
 		UserAgentMatcherFactory::loadMatchers();
 		$matchers = WurflConstants::$matchers;
 		sort($matchers);
@@ -419,7 +419,7 @@ class TeraWurfl{
 			}
 		}
 	}
-	
+
 	/**
 	 * Log an error in the Tera-WURFL log file
 	 * @see TeraWurflConfig
@@ -471,7 +471,7 @@ class TeraWurfl{
 		$this->matcherHistory = array();
 		// Return generic UA if userAgent is empty
 		if (strlen($this->httpRequest->user_agent)==0) {
-			$this->matchData['matcher'] = "none"; 
+			$this->matchData['matcher'] = "none";
 			$this->matchData['match_type'] = "none";
 			$this->matchData['match'] = false;
 			$this->setMatcherHistory();
@@ -481,7 +481,7 @@ class TeraWurfl{
 				return WurflConstants::NO_MATCH;
 			}
 		}
-		
+
 		// Check for exact match
 		if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE && $this->httpRequest->user_agent == WurflConstants::SIMPLE_DESKTOP_UA) {
 			// SimpleDesktop UA Matching avoids querying the database here
@@ -552,7 +552,7 @@ class TeraWurfl{
 				return $deviceID;
 			}
 		}
-		
+
 		// A matching device still hasn't been found - check HTTP ACCEPT headers
 		if ($this->httpRequest->accept->length() > 0) {
 			$this->matcherHistory[] = 'http_accept';
@@ -569,7 +569,7 @@ class TeraWurfl{
 		$this->matchData['match_type'] = "none";
 		$this->matchData['match'] = false;
 		$this->setMatcherHistory();
-		
+
 		if ($this->httpRequest->uaprof instanceof TeraWurflUserAgentProfile && $this->httpRequest->uaprof->containsValidUrl()) return WurflConstants::GENERIC_MOBILE;
 		if ($this->httpRequest->isMobileBrowser()) return WurflConstants::GENERIC_MOBILE;
 		if ($this->httpRequest->isSmartTV()) return WurflConstants::GENERIC_SMARTTV;
@@ -608,7 +608,7 @@ class TeraWurfl{
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the value of the requested capability for the detected device
 	 * @param string $capability Capability name (e.g. "is_wireless_device")
@@ -622,7 +622,7 @@ class TeraWurfl{
 		}
 		return $this->virtual_cap_provider->get($capability);
 	}
-	
+
 	/**
 	 * Gets an array of all the virtual capabilities
 	 * @return array Virtual capabilities in format "name => value"
@@ -631,11 +631,11 @@ class TeraWurfl{
 	public function getAllVirtualCapabilities() {
 		return $this->virtual_cap_provider->getAll();
 	}
-	
+
 	public function __get($capability) {
 		return $this->getDeviceCapability($capability);
 	}
-	
+
 	/**
 	 * Get the absolute path to the data directory on the filesystem
 	 * @return string Absolute path to data directory
@@ -643,7 +643,7 @@ class TeraWurfl{
 	public static function absoluteDataDir() {
 		return dirname(__FILE__).'/'.TeraWurflConfig::$DATADIR;
 	}
-	
+
 	/**
 	 * Flattens the capabilities array for fast access
 	 */

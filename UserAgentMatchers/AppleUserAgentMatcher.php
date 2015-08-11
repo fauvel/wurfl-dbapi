@@ -20,14 +20,14 @@
  * @package TeraWurflUserAgentMatchers
  */
 class AppleUserAgentMatcher extends UserAgentMatcher {
-	
+
 	/**
-	* This flag tells the WurflLoader that the User Agent may be permanantly 
+	* This flag tells the WurflLoader that the User Agent may be permanantly
 	* altered during matching
 	* @var boolean
 	*/
 	public $runtime_normalization = true;
-	
+
 	public static $constantIDs = array(
 		'apple_ipod_touch_ver1',
 		'apple_ipod_touch_ver2',
@@ -38,7 +38,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver7',
 		'apple_ipod_touch_ver8',
 		'apple_ipod_touch_ver9',
-				
+
 		'apple_ipad_ver1',
 		'apple_ipad_ver1_subua32',
 		'apple_ipad_ver1_sub42',
@@ -47,7 +47,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub7',
 		'apple_ipad_ver1_sub8',
 		'apple_ipad_ver1_sub9',
-				
+
 		'apple_iphone_ver1',
 		'apple_iphone_ver2',
 		'apple_iphone_ver3',
@@ -57,7 +57,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver7',
 		'apple_iphone_ver8',
 		'apple_iphone_ver9',
-	
+
 		//iOS HW IDs
 		'apple_ipad_ver1_subhw1',
 		'apple_ipad_ver1_sub42_subhw1',
@@ -134,7 +134,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub9_subhwmini1',
 		'apple_ipad_ver1_sub9_subhwmini2',
 		'apple_ipad_ver1_sub9_subhwmini3',
-		
+
 		'apple_iphone_ver1_subhw2g',
 		'apple_iphone_ver2_subhw2g',
 		'apple_iphone_ver2_subhw3g',
@@ -265,7 +265,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver8_4_subhw5',
 		'apple_ipod_touch_ver9_subhw5',
 	);
-	
+
 	// iOS hardware mappings
 	public static $iphoneDeviceMap = array(
 		'1,1' => '2g',
@@ -284,7 +284,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'7,1' => '6plus',
 		'7,2' => '6',
 	);
-	
+
 	public static $ipadDeviceMap = array(
 		'1,1' => '1',
 		'2,1' => '2',
@@ -312,7 +312,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'5,3' => 'air2',
 		'5,4' => 'air2',
 	);
-	
+
 	public static $ipodDeviceMap = array(
 		'1,1' => '1',
 		'2,1' => '2',
@@ -320,31 +320,31 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'4,1' => '4',
 		'5,1' => '5',
 	);
-	
+
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
 		return ($httpRequest->user_agent->contains(array('iPhone', 'iPod', 'iPad')));
 	}
-	
+
 	public function applyConclusiveMatch() {
-		
+
 		//Normalize AFNetworking and server-bag UAs
 		//Pippo/2.4.3 (iPad; iOS 8.0.2; Scale/2.00)
 		//server-bag [iPhone OS,8.2,12D508,iPhone4,1]
-		//iPhone4,1/8.2 (12D508)		
-		if ( preg_match('#^[^/]+?/[\d\.]+? \(i[A-Za-z]+; iOS ([\d\.]+); Scale/[\d\.]+\)#', $this->userAgent, $matches) 
+		//iPhone4,1/8.2 (12D508)
+		if ( preg_match('#^[^/]+?/[\d\.]+? \(i[A-Za-z]+; iOS ([\d\.]+); Scale/[\d\.]+\)#', $this->userAgent, $matches)
 				|| preg_match('#^server-bag \[iPhone OS,([\d\.]+),#', $this->userAgent, $matches)
 				|| preg_match('#^i(?:Phone|Pad|Pod)\d+?,\d+?/([\d\.]+)#', $this->userAgent, $matches)) {
 			$matches[1] = str_replace(".", "_", $matches[1]);
 			if ($this->userAgent->contains("iPad")) {
 				$this->userAgent->set("Mozilla/5.0 (iPad; CPU OS {$matches[1]} like Mac OS X) AppleWebKit/538.39.2 (KHTML, like Gecko) Version/7.0 Mobile/12A4297e Safari/9537.53 ".$this->userAgent);
-			
+
 			} else if ($this->userAgent->contains("iPod touch")) {
 				$this->userAgent->set("Mozilla/5.0 (iPod touch; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/538.41 (KHTML, like Gecko) Version/7.0 Mobile/12A307 Safari/9537.53 ".$this->userAgent);
-			
+
 			} else if ($this->userAgent->contains("iPod")) {
 				$this->userAgent->set("Mozilla/5.0 (iPod; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/538.41 (KHTML, like Gecko) Version/7.0 Mobile/12A307 Safari/9537.53 ".$this->userAgent);
-			
+
 			} else {
 				$this->userAgent->set("Mozilla/5.0 (iPhone; CPU iPhone OS {$matches[1]} like Mac OS X) AppleWebKit/601.1.10 (KHTML, like Gecko) Version/8.0 Mobile/12E155 Safari/600.1.4 ".$this->userAgent);
 			}
@@ -354,7 +354,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		if (preg_match('#^iOSClientSDK/\d+\.+[0-9\.]+ +?\((Mozilla.+)\)$#', $this->userAgent, $matches)) {
 			$this->userAgent->set($matches[1]);
 		}
-		
+
 		// Normalize iOS {Ver} style UAs
 		//Eg: Mozilla/5.0 (iPhone; U; CPU iOS 7.1.2 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Safari/528.16
 		if (preg_match("#CPU iOS \d+?\.\d+?#", $this->userAgent)) {
@@ -363,10 +363,10 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 				$versionUnderscore = str_replace(".", "_", $matches[1]);
 				$ua = str_replace(" U;", "", $ua);
 				$ua = preg_replace("#CPU(?: iPhone)? OS ([\d\.]+) like#", $versionUnderscore, $ua);
-				$this->userAgent->set($ua);  	
+				$this->userAgent->set($ua);
 			}
 		}
-	
+
 		// Attempt to find hardware version
 		$device_version = null;
 		if (preg_match('#(?:iPhone|iPad|iPod) ?(\d,\d)#', $this->userAgent, $matches)) {
@@ -374,21 +374,21 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 			if ($this->userAgent->contains("iPod")) {
 				if (array_key_exists($matches[1], self::$ipodDeviceMap)) {
 					$device_version = str_replace(array_keys(self::$ipodDeviceMap), array_values(self::$ipodDeviceMap), $matches[1]);
-				}	
+				}
 			} else if ($this->userAgent->contains("iPad")) {
 				if (array_key_exists($matches[1], self::$ipadDeviceMap)) {
 					$device_version = str_replace(array_keys(self::$ipadDeviceMap), array_values(self::$ipadDeviceMap), $matches[1]);
-				}	
+				}
 			} else if ($this->userAgent->contains("iPhone")) {
 				if (array_key_exists($matches[1], self::$iphoneDeviceMap)) {
 					$device_version = str_replace(array_keys(self::$iphoneDeviceMap), array_values(self::$iphoneDeviceMap), $matches[1]);
 				}
-			// Set $device_version to null if UA contains unrecognized hardware version or does not satisfy any of the above 'if' statements 
+			// Set $device_version to null if UA contains unrecognized hardware version or does not satisfy any of the above 'if' statements
 			} else {
 				$device_version = null;
 			}
 		}
-		
+
 		$tolerance = $this->userAgent->indexOf('_');
 		if ($tolerance !== false) {
 			// The first char after the first underscore
@@ -403,9 +403,9 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 				$tolerance = $this->userAgent->length();
 			}
 		}
-		
+
 		$ris_id = $this->risMatch($tolerance);
-		
+
 		//Assemble and check iOS HW ID
 		if ($device_version !== null) {
 			$test_id = $ris_id."_subhw".$device_version;
@@ -416,7 +416,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 
 		return $ris_id;
 	}
-	
+
 	public function applyRecoveryMatch() {
 		if (preg_match('/ (\d)_(\d)[ _]/', $this->userAgent, $matches)) {
 			$major_version = (int)$matches[1];
@@ -425,12 +425,12 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 			$major_version = -1;
 			$minor_version = -1;
 		}
-		
+
 		// Core-media
 		if ($this->userAgent->contains('CoreMedia')) {
 			return 'apple_iphone_coremedia_ver1';
 		}
-		
+
 		// Check iPods first since they also contain 'iPhone'
 		if ($this->userAgent->contains('iPod')) {
 			$deviceID = 'apple_ipod_touch_ver'.$major_version;
@@ -439,23 +439,23 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 			} else {
 				return 'apple_ipod_touch_ver1';
 			}
-			
+
 		// Now check for iPad
 		} else if ($this->userAgent->contains('iPad')) {
 			$deviceID = 'apple_ipad_ver1_sub'.$major_version;
-			
+
 			if ($major_version == 3) {
 				return 'apple_ipad_ver1_subua32';
 			} else if ($major_version == 4) {
 				return 'apple_ipad_ver1_sub42';
 			}
-			
+
 			if (in_array($deviceID, self::$constantIDs)) {
 				return $deviceID;
 			} else {
 				return 'apple_ipad_ver1';
 			}
-			
+
 		// Check iPhone last
 		} else if ($this->userAgent->contains('iPhone')) {
 			$deviceID = 'apple_iphone_ver'.$major_version;

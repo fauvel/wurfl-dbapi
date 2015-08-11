@@ -42,10 +42,10 @@ ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 - Added Opera for Android UA support in VC tool
 - Added iOS 8.1 WURFL hardware IDs
 - LD Algorithm Enhancement
-- Added UC browser on Windows Phone support 
+- Added UC browser on Windows Phone support
 
 [2014.09.22] ScientiaMobile Database API 1.5.2.1
-- Improved form_factor capability         
+- Improved form_factor capability
 - Improved support for Apple devices
 
 [2014.09.02] ScientiaMobile Database API 1.5.2.0
@@ -82,7 +82,7 @@ ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 	- Pantech feature phones
 - Added new matcher for Desktop Applications
 - Optimized matcher order
- 
+
 [2013.10.14] ScientiaMobile Database API 1.5.0.2
 - Bugfix: Virtual capabilities unavailable
 
@@ -283,7 +283,7 @@ ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 - Completely re-wrote the UA matching system, scrapping a lot of unnecessary code that was wasting time!
 
 [2007.05.09] Stable 1.5.1
-- Fixed a bug that prevented the updating system from working correctly over the web. 
+- Fixed a bug that prevented the updating system from working correctly over the web.
 - If you have version 1.5.0 you can delete line 266 from the file tera_wurfl_parser.php and it will function the same as 1.5.1.
 
 [2007.04.27] Stable 1.5.0

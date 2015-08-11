@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "*",
-        "phing/phing": "2.7.*"
+        "phing/phing": "~2"
     },
     "require": {
         "php": ">=5.3.0"
