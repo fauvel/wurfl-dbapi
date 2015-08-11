@@ -20,9 +20,9 @@
  * @package TeraWurflUserAgentMatchers
  */
 class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
-
+	
 	public $runtime_normalization = true;
-
+	
 	public static $constantIDs = array(
 		'generic_ms_winmo6_5',
 		'generic_ms_phone_os7',
@@ -36,16 +36,16 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		'generic_ms_phone_os8_desktopmode',
 		'generic_ms_phone_os10_desktopmode',
 	);
-
+	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-
+		
 		// Capturing WP desktop mode UAs but not Windows RT UAs
 		if ($httpRequest->user_agent->contains(array('WPDesktop','ZuneWP7')) || ($httpRequest->user_agent->contains('Mozilla/5.0 (Windows NT ') && $httpRequest->user_agent->contains(' ARM;') && $httpRequest->user_agent->contains(' Edge/'))) return true;
-
+		
 		return $httpRequest->user_agent->contains(array('Windows Phone', 'WindowsPhone','NativeHost'));
 	}
-
+	
 	public function applyConclusiveMatch() {
 		if ($this->userAgent->contains(array('WPDesktop','ZuneWP7')) || ($this->userAgent->contains('Mozilla/5.0 (Windows NT ') && $this->userAgent->contains(' ARM;') && $this->userAgent->contains(' Edge/'))) {
 			$model = self::getWindowsPhoneDesktopModel($this->userAgent);
@@ -69,16 +69,16 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		return WurflConstants::NO_MATCH;
 	}
 	public function applyRecoveryMatch() {
-
+		
 		if ($this->userAgent->contains(array('WPDesktop','ZuneWP7')) || ($this->userAgent->contains('Mozilla/5.0 (Windows NT ') && $this->userAgent->contains(' ARM;') && $this->userAgent->contains(' Edge/'))) {
 			if ($this->userAgent->contains('Mozilla/5.0 (Windows NT ') && $this->userAgent->contains(' ARM;') && $this->userAgent->contains(' Edge/')) return 'generic_ms_phone_os10_desktopmode';
 			if ($this->userAgent->contains('WPDesktop')) return 'generic_ms_phone_os8_desktopmode';
 			if ($this->userAgent->contains('Trident/5.0')) return 'generic_ms_phone_os7_5_desktopmode';
 			return 'generic_ms_phone_os7_desktopmode';
 		}
-
+		
 		$version = self::getWindowsPhoneVersion($this->userAgent);
-
+		
 		if ($version == "10.0")return 'generic_ms_phone_os10';
 		if ($version == "8.1") return 'generic_ms_phone_os8_1';
 		if ($version == "8.0") return 'generic_ms_phone_os8';
@@ -89,11 +89,11 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 
 		//These are probably UAs of the type "Windows Phone Ad Client (Xna)/5.1.0.0 BMID/E67970D969"
 		if ($this->userAgent->startsWith('Windows Phone Ad Client') || $this->userAgent->startsWith('WindowsPhoneAdClient')) {
-			return 'generic_ms_phone_os7';
+			return 'generic_ms_phone_os7';	
 		}
 		return WurflConstants::NO_MATCH;
 	}
-
+	
 	public static function getWindowsPhoneModel($ua) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
@@ -120,12 +120,12 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 			//   Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; RM-821_eu_euro2_248)
 			//   Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; RM-821_eu_sweden_235)
 			$model = preg_replace('/(NOKIA; RM-.+?)_.*/', '$1', $model, 1);
-
+			
 			return $model;
 		}
 		return null;
 	}
-
+	
 	public static function getWindowsPhoneAdClientModel($ua) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
@@ -138,7 +138,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		return null;
 	}
 
-
+		
 	public static function getWindowsPhoneVersion($ua) {
 		if (preg_match('|Windows ?Phone(?: ?OS)? ?(\d+\.\d+)|', $ua, $matches)) {
 			if (strpos($matches[1], "10.0") !== false) {
@@ -156,10 +156,10 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 			} else {
 				return '7.0';
 			}
-		}
+		}	
 		return null;
 	}
-
+	
 	public static function getWindowsPhoneDesktopModel($ua) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
@@ -171,7 +171,7 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		}
 		return null;
 	}
-
+	
 	public static function getWindowsPhoneDesktopVersion($ua) {
 		if (preg_match('|Windows NT (\d+\.\d+)|', $ua, $matches)) {
 			if (strpos($matches[1], "10.0") !== false) {
@@ -184,5 +184,5 @@ class WindowsPhoneUserAgentMatcher extends UserAgentMatcher {
 		}
 		return null;
 	}
-
+	
 }

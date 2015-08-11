@@ -20,7 +20,7 @@
  * @package HttpHeaderNormalizers
  */
 class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
-
+	
 	/**
 	 * @var TeraWurflUserAgent
 	 */
@@ -39,7 +39,7 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 		$this->normalizeTransferEncoding();
 		//$this->normalizeEncryptionLevel();
 	}
-
+	
 	protected function normalizeEncryptionLevel() {
 		$this->_user_agent->cleaned = str_replace(' U;', '', $this->_user_agent->cleaned);
 	}

@@ -1,7 +1,12 @@
 *.sw?
-vendor/
-.idea/
-.buildpath
+*~
 .settings
+.buildpath
 .project
-composer.phar
+.idea/
+vendor/
+data/*
+error.log
+ergebnis.txt
+resources/browscap-*/
+build/

@@ -20,9 +20,9 @@
  * @package TeraWurflUserAgentMatchers
  */
 class OperaUserAgentMatcher extends UserAgentMatcher {
-
+	
 	public $runtime_normalization = true;
-
+	
 	public static $constantIDs = array(
 		'opera',
 		'opera_7',
@@ -48,12 +48,12 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 		'opera_29',
 		'opera_30',
 	);
-
+	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isMobileBrowser()) return false;
 		return $httpRequest->user_agent->contains(array('Opera','OPR/'));
 	}
-
+	
 	/**
 	 * @var string Opera version is stored here for performance
 	 */
@@ -70,13 +70,13 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 			// Match to the '.' in the Opera version number
 			return $this->risMatch($this->userAgent->indexOf('.'));
 		}
-
-		// Normalize Opera v15 and above UAs, that say OPR, into "Opera/version UA" format used above
+		
+		// Normalize Opera v15 and above UAs, that say OPR, into "Opera/version UA" format used above 
 		if (preg_match('#OPR/(\d+\.\d+)#', $this->userAgent, $matches)) {
 		$prefix = "Opera/".$matches[1]." ";
 		$this->userAgent->set($prefix.$this->userAgent);
 		}
-
+		
 		$opera_idx = $this->userAgent->indexOf('Opera');
 		$tolerance = $this->userAgent->indexOfOrLength('.', $opera_idx);
 		return $this->risMatch($tolerance);
