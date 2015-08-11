@@ -26,6 +26,7 @@ class SmartTVUserAgentMatcher extends UserAgentMatcher {
 		'generic_smarttv_googletv_browser',
 		'generic_smarttv_appletv_browser',
 		'generic_smarttv_boxeebox_browser',
+		'generic_smarttv_chromecast',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
@@ -42,6 +43,7 @@ class SmartTVUserAgentMatcher extends UserAgentMatcher {
 		if ($this->userAgent->contains('GoogleTV')) return 'generic_smarttv_googletv_browser';
 		if ($this->userAgent->contains('AppleTV')) return 'generic_smarttv_appletv_browser';
 		if ($this->userAgent->contains('Boxee')) return 'generic_smarttv_boxeebox_browser';
+		if ($this->userAgent->contains('CrKey')) return 'generic_smarttv_chromecast';
 		return 'generic_smarttv_browser';
 	}
 }

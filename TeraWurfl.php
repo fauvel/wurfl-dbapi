@@ -112,8 +112,8 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.6.0.0";
-	public $historical_release_version = "2.3.0";
+	public $release_version = "1.6.1.0";
+	public $historical_release_version = "2.3.1";
 	/**
 	 * The required version of PHP for this release
 	 * @var string

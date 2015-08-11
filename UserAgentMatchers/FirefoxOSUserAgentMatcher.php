@@ -34,6 +34,8 @@ class FirefoxOSUserAgentMatcher extends UserAgentMatcher {
 		'firefox_os_ver2_0_tablet',
 		'firefox_os_ver2_1',
 		'firefox_os_ver2_1_tablet',
+		'firefox_os_ver2_2',
+		'firefox_os_ver2_2_tablet',
 	);
 	
 	public static $firefoxOSMap = array(
@@ -45,6 +47,7 @@ class FirefoxOSUserAgentMatcher extends UserAgentMatcher {
 		'32.0' => '2.0',
 		'33.0' => '2.1',
 		'34.0' => '2.1',
+		'37.0' => '2.2',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {

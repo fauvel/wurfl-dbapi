@@ -45,6 +45,8 @@ class OperaUserAgentMatcher extends UserAgentMatcher {
 		'opera_26',
 		'opera_27',
 		'opera_28',
+		'opera_29',
+		'opera_30',
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {

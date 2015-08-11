@@ -284,8 +284,8 @@ class TeraWurflLoader{
 	 * @return bool Success
 	 */
 	public function loadPatches(){
-		if(!TeraWurflConfig::$PATCH_ENABLE) return true;
 		$this->timepatch = microtime(true);
+		if(!TeraWurflConfig::$PATCH_ENABLE) return true;
 		// Explode the patchfile string into an array of patch files (normally just one file)
 		$patches = explode(';',TeraWurflConfig::$PATCH_FILE);
 		foreach($patches as $patch){

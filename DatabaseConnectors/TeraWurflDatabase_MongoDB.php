@@ -238,11 +238,11 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 		$this->_dropCollectionIfExists(self::$MERGE);
 		$this->_renameCollection($temptable, self::$MERGE);
 		// Enforce Indecies
-		$this->mergecoll->ensureIndex(array('deviceID' => 1), array("unique"=>true,"dropDups"=>true,"background"=>true,"safe"=>false));
-		$this->mergecoll->ensureIndex(array('user_agent' => 1), array("unique"=>false,"dropDups"=>false,"background"=>true,"safe"=>false));
-		$this->mergecoll->ensureIndex(array('fall_back' => 1), array("unique"=>false,"dropDups"=>false,"background"=>true,"safe"=>false));
-		$this->mergecoll->ensureIndex(array('matcher' => 1), array("unique"=>false,"dropDups"=>false,"background"=>true,"safe"=>false));
-		$this->mergecoll->ensureIndex(array('match' => 1), array("unique"=>false,"dropDups"=>false,"background"=>true,"safe"=>false));
+		$this->mergecoll->ensureIndex(array('deviceID' => 1), array("unique"=>true,"background"=>true,"safe"=>false));
+		$this->mergecoll->ensureIndex(array('user_agent' => 1), array("unique"=>false,"background"=>true,"safe"=>false));
+		$this->mergecoll->ensureIndex(array('fall_back' => 1), array("unique"=>false,"background"=>true,"safe"=>false));
+		$this->mergecoll->ensureIndex(array('matcher' => 1), array("unique"=>false,"background"=>true,"safe"=>false));
+		$this->mergecoll->ensureIndex(array('match' => 1), array("unique"=>false,"background"=>true,"safe"=>false));
 		return true;
 	}
 	
@@ -251,7 +251,7 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 		if($this->collectionExists($name)){
 			$this->_createCollection($name);
 			$collection = $this->dbcon->selectCollection($name);
-			//$collection->ensureIndex(array('id' => 1), array("unique"=>true,"dropDups"=>true,"background"=>false,"safe"=>true));
+			//$collection->ensureIndex(array('id' => 1), array("unique"=>true,"background"=>false,"safe"=>true));
 		}
 	}
 	// Cache Table Functions ---------------------------------------------------
@@ -264,7 +264,7 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 		$name = TeraWurflConfig::$TABLE_PREFIX.'Cache';
 		$this->_recreateCollection($name);
 		$collection = $this->dbcon->selectCollection($name);
-		$collection->ensureIndex(array('user_agent' => 1), array("unique"=>true,"dropDups"=>true,"background"=>true,"safe"=>false));
+		$collection->ensureIndex(array('user_agent' => 1), array("unique"=>true,"background"=>true,"safe"=>false));
 	}
 
 

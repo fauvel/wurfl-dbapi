@@ -152,6 +152,8 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 			'711.00' => array('iPhone','8_0'),
 			'711.10' => array('iPhone','8_1'),
 			'711.20' => array('iPhone','8_2'),
+			'711.30' => array('iPhone','8_3'),
+			'711.40' => array('iPhone','8_4'),
 		);
 
 		if (array_key_exists($cfVersion, $cfnetworkMap)){

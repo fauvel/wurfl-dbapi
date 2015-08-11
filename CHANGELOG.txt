@@ -1,5 +1,20 @@
 ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 
+[2015.07.01] ScientiaMobile Database API 1.6.1.0
+- Improved detection in VC tool for:
+    - MSIE 12/Edge
+    - Baidu browser
+    - Apple
+- Improved detection of:
+    - Windows Phone
+    - Kindle
+    - SmartTV
+    - Apple
+    - CFNetwork
+    - FirefoxOS
+    - Opera
+- Added MongoDB 3 compatibility
+
 [2015.04.01] ScientiaMobile Database API 1.6.0.0
 - Added
     - Android 5.1 support

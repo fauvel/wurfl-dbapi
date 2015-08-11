@@ -33,6 +33,10 @@ class KindleUserAgentMatcher extends UserAgentMatcher {
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
+		
+		if ($httpRequest->user_agent->contains("Android") && $httpRequest->user_agent->contains("/Kindle")) {
+			return false;
+		}
 		return $httpRequest->user_agent->contains(array('Kindle', 'Silk'));
 	}
 	

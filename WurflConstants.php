@@ -68,7 +68,6 @@ class WurflConstants {
 		'UbuntuTouchOS',
 		'Tizen',
 		'Apple',
-		'WindowsPhoneDesktop',
 		'NokiaOviBrowser', // must come before the Nokia matcher
 
 		/**** High workload mobile matchers ****/
