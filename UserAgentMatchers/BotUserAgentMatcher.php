@@ -26,6 +26,10 @@ class BotUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyConclusiveMatch() {
+		
+		if ($this->userAgent->startsWith("Mozilla")) {
+			return $this->risMatch($this->userAgent->firstCloseParen());
+		}
 		return $this->risMatch($this->userAgent->firstSlash());
 	}
 	
