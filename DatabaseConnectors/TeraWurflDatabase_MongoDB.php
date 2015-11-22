@@ -308,7 +308,7 @@ class TeraWurflDatabase_MongoDB extends TeraWurflDatabase {
 
 		try {
 			$cachecoll = $this->dbcon->selectCollection(TeraWurflConfig::$TABLE_PREFIX.'Cache');
-			$cachecoll->insert($toinsert, array('safe' => true));
+			$cachecoll->insert($toinsert, array('w' => 1));
 			$this->numQueries++;
 			return true;
 
@@ -402,7 +402,7 @@ EOL;
 		$this->numQueries++;
 		$collection->save(
 			array('_id' => 'performRis','value' => new MongoCode($performRis)),
-			array('safe' => true)
+			array('w' => 1)
 		);
 		$this->numQueries++;
 		$collection->remove(array("_id"=>"performFallback"));
@@ -424,7 +424,7 @@ EOL;
 		$this->numQueries++;
 		$collection->save(
 			array('_id' => 'performFallback','value' => new MongoCode($performFallback)),
-			array('safe' => true)
+			array('w' => 1)
 		);
 	}
 

@@ -260,6 +260,7 @@ class VirtualCapability_IsAppWebview extends VirtualCapability {
 		'MiuiBrowser',
 		'MQQBrowser',
 		'CriOS',
+	    'Firefox',
 	);
 	
 	protected function compute() {
@@ -270,16 +271,28 @@ class VirtualCapability_IsAppWebview extends VirtualCapability {
 		if ($ua->contains($this->third_party_browsers)) {
 			return false;
 		}
+		
+		// Lollipop implementation of webview adds a ; wv to the UA
+		if ($this->wurfl->device_os == "Android" && strpos($ua->original, '; wv) ') !== false) {
+			return true;
+		}
 
 		// Handling Chrome separately
-		if ($ua->contains("Chrome") && !$ua->contains("Version")) {
+		if ($this->wurfl->device_os == "Android" && $ua->contains("Chrome") && !$ua->contains("Version")) {
 			return false;
 		}
 
+		// iOS webview logic is pretty simple
 		if ($this->wurfl->device_os == "iOS" && !$ua->contains("Safari")) {
-			// iOS webview logic is pretty simple
 			return true;
-		} else if ($this->wurfl->device_os == "Android") {
+		}
+		
+		// So is Mac OS X's webview logic
+		if ($this->wurfl->advertised_device_os == "Mac OS X" && !$ua->contains("Safari")) {
+			return true;
+		}
+		
+		if ($this->wurfl->device_os == "Android") {
 		
 			if ($this->wurfl->httpRequest->headerExists("HTTP_X_REQUESTED_WITH")) {
 				$requested_with = $this->wurfl->httpRequest->getHeader("HTTP_X_REQUESTED_WITH");
@@ -557,7 +570,7 @@ class VirtualCapabilityGroup_DeviceBrowser extends VirtualCapabilityGroup {
 			if (!class_exists('VirtualCapability_UserAgentTool', false)) {
 				include dirname(__FILE__).'/VirtualCapability_UserAgentTool.php';
 			}
-			self::$ua_tool = new VirtualCapability_UserAgentTool();
+			self::$ua_tool = new VirtualCapability_UserAgentTool($this->wurfl);
 		}
 		
 		// Run the UserAgentTool to get the relevant details

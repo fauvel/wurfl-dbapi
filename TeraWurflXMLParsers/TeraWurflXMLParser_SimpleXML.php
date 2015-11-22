@@ -87,7 +87,7 @@ class TeraWurflXMLParser_SimpleXML extends TeraWurflXMLParser {
 		$filtering = ($this->capability_filter)? true: false;
 		$includegroup = false;
 		if(isset($device['fall_back'])) $this->devices[$id]['fall_back'] = (string)$device['fall_back'];
-		if(isset($device['user_agent'])) $this->devices[$id]['user_agent'] = TeraWurflUserAgent::cleanUserAgent((string)$device['user_agent']);
+		if(isset($device['user_agent'])) $this->devices[$id]['user_agent'] = (string)$device['user_agent'];
 		if(isset($device['actual_device_root'])){
 			$this->devices[$id]['actual_device_root'] = (string)$device['actual_device_root'];
 			$this->devices[$id]['actual_device_root'] = ($this->devices[$id]['actual_device_root'])?1:0;

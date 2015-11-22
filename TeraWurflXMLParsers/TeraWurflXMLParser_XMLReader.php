@@ -69,7 +69,7 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser {
 		$device =& $this->devices[$this->xml->getAttribute('id')];
 		$device=array(
 			'id' => $this->xml->getAttribute('id'),
-			'user_agent' => TeraWurflUserAgent::cleanUserAgent($this->xml->getAttribute('user_agent')),
+			'user_agent' => (string)$this->xml->getAttribute('user_agent'),
 			'fall_back' => $this->xml->getAttribute('fall_back'),
 		);
 		if($this->xml->getAttribute('actual_device_root')) $device['actual_device_root'] = ($this->xml->getAttribute('actual_device_root')=="true")?1:0;
@@ -86,7 +86,7 @@ class TeraWurflXMLParser_XMLReader extends TeraWurflXMLParser {
 					$device =& $this->devices[$this->xml->getAttribute('id')];
 					$device=array(
 						'id' => $this->xml->getAttribute('id'),
-						'user_agent' => TeraWurflUserAgent::cleanUserAgent($this->xml->getAttribute('user_agent')),
+						'user_agent' => (string)$this->xml->getAttribute('user_agent'),
 						'fall_back' => $this->xml->getAttribute('fall_back'),
 					);
 					if($this->xml->getAttribute('actual_device_root')) $device['actual_device_root'] = ($this->xml->getAttribute('actual_device_root')=="true")?1:0;

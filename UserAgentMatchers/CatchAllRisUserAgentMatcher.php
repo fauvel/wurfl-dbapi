@@ -37,7 +37,11 @@ class CatchAllRisUserAgentMatcher extends UserAgentMatcher {
 
     public function applyConclusiveMatch() {
         $this->match_type = 'conclusive';
-        $deviceID = $this->risMatch($this->userAgent->firstSlash());
+        if ($this->userAgent->startsWith("CFNetwork/")) {
+        	$deviceID = $this->risMatch($this->userAgent->firstSpace());
+        } else {
+        	$deviceID = $this->risMatch($this->userAgent->firstSlash());
+        }
         if ($deviceID != WurflConstants::NO_MATCH) $this->match = true;
         return $deviceID;
     }

@@ -248,5 +248,8 @@ class WurflConstants {
 		'feedfetcher-google',
 		'mowser',
 		'trove',
+	    'google web preview',
+		'googleimageproxy',
+	    
 	);
 }
