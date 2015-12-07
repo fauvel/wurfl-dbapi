@@ -40,7 +40,8 @@ class CatchAllMozillaUserAgentMatcher extends UserAgentMatcher {
 
         if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE === true) {
             //High performance mode
-            return $this->risMatch($this->userAgent->firstCloseParen());
+            $tolerance = $this->userAgent->firstCloseParen() + 1;
+            return $this->risMatch($tolerance);
         } else {
             //High accuracy mode
             $deviceID = $this->ldMatch(5);

@@ -21,14 +21,22 @@
  */
 class BotUserAgentMatcher extends UserAgentMatcher {
 	
+	public static $constantIDs = array(
+	    'google_image_proxy',
+	);
+	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		return $httpRequest->isRobot();
 	}
 	
 	public function applyConclusiveMatch() {
 		
+		if ($this->userAgent->contains("GoogleImageProxy")) {
+			return 'google_image_proxy';
+		}
 		if ($this->userAgent->startsWith("Mozilla")) {
-			return $this->risMatch($this->userAgent->firstCloseParen());
+            $tolerance = $this->userAgent->firstCloseParen() + 1;
+			return $this->risMatch($tolerance);
 		}
 		return $this->risMatch($this->userAgent->firstSlash());
 	}
