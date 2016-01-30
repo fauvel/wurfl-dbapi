@@ -74,7 +74,7 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 	);
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-		return !$httpRequest->user_agent->contains('like Android') &&  $httpRequest->user_agent->contains('Android');
+		return !$httpRequest->user_agent->contains(array('like Android', 'Symbian')) &&  $httpRequest->user_agent->contains('Android');
 	}
 	
 	public function applyConclusiveMatch() {
@@ -200,13 +200,15 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		} else {
 			return null;
 		}
-		
-		
+				
 		// The previous RegEx may return just "Build/.*" for UAs like:
 		// HTC_Dream Mozilla/5.0 (Linux; U; Android 1.5; xx-xx; Build/CUPCAKE) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
 		if (strpos($model, 'Build/') === 0) {
 			return null;
 		}
+		
+		// Replace xx-xx (locale) in the model name with ''
+		$model = str_replace("xx-xx", "", $model);
 
 		// Normalize Chinese UAs
 		$model = preg_replace('#(?:_CMCC_TD|_CMCC|_TD)\b#', '', $model);
@@ -256,7 +258,7 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 		
 		// Normalize Samsung and Sony/SonyEricsson model name changes due to Chrome Mobile
 		$model = preg_replace('#^(?:SAMSUNG|SonyEricsson|Sony)[ \-]?#', '', $model);
-		
+
 		return (strlen($model) === 0)? null: $model;
 	}
 	

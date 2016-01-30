@@ -32,7 +32,7 @@ class CatchAllMozillaUserAgentMatcher extends UserAgentMatcher {
     }
 
     public static function canHandle(TeraWurflHttpRequest $httpRequest) {
-        return $httpRequest->user_agent->startsWith(array('Mozilla/4', 'Mozilla/5'));
+        return $httpRequest->user_agent->startsWith(array('Mozilla/3', 'Mozilla/4', 'Mozilla/5'));
     }
 
     public function applyConclusiveMatch() {
@@ -40,7 +40,7 @@ class CatchAllMozillaUserAgentMatcher extends UserAgentMatcher {
 
         if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE === true) {
             //High performance mode
-            $tolerance = $this->userAgent->firstCloseParen() + 1;
+            $tolerance = $this->userAgent->firstCloseParen();
             return $this->risMatch($tolerance);
         } else {
             //High accuracy mode

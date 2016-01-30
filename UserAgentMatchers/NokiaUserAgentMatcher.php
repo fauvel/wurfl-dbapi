@@ -29,11 +29,14 @@ class NokiaUserAgentMatcher extends UserAgentMatcher {
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return $httpRequest->user_agent->contains('Nokia');
+		return $httpRequest->user_agent->contains('Nokia') && !$httpRequest->user_agent->contains(array('Android', 'iPhone'));
 	}
 	
 	public function applyConclusiveMatch() {
 		$tolerance = $this->userAgent->indexOfOrLength(array('/', ' '), $this->userAgent->indexOf('Nokia'));
+		if ($this->userAgent->startsWith("Nokia/") || $this->userAgent->startsWith("Nokia ")) {
+		    $tolerance = strlen($this->userAgent);
+		}
 		return $this->risMatch($tolerance);
 	}
 	public function applyRecoveryMatch() {

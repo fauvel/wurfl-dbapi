@@ -412,7 +412,8 @@ function performFallback(deviceID){
 	var res;
 	var tree = [];
 	var i = 0;
-	while(current_fall_back != 'root' && i++ < 30){
+	var max_limit = 100;
+	while(current_fall_back != 'root' && i++ < max_limit){
 		res = db.$merge.findOne({deviceID:current_fall_back},{capabilities:1});
 		if(!res) return tree;
 		tree.push(res.capabilities);

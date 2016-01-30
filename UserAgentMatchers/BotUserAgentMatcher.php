@@ -35,13 +35,14 @@ class BotUserAgentMatcher extends UserAgentMatcher {
 			return 'google_image_proxy';
 		}
 		if ($this->userAgent->startsWith("Mozilla")) {
-            $tolerance = $this->userAgent->firstCloseParen() + 1;
-			return $this->risMatch($tolerance);
-		}
-		return $this->risMatch($this->userAgent->firstSlash());
+            $tolerance = $this->userAgent->firstCloseParen();
+		} else {
+            $tolerance = $this->userAgent->firstSlash();
+        }
+        return $this->risMatch($tolerance);
 	}
 	
 	public function applyRecoveryMatch() {
-		return WurflConstants::GENERIC_WEB_BROWSER;
+		return WurflConstants::GENERIC_WEB_CRAWLER;
 	}
 }

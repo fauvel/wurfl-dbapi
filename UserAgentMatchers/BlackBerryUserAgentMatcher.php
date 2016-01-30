@@ -44,7 +44,7 @@ class BlackBerryUserAgentMatcher extends UserAgentMatcher {
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return ($httpRequest->user_agent->iContains('blackberry') || $httpRequest->user_agent->contains('(BB10;'));
+		return ($httpRequest->user_agent->iContains('blackberry') || $httpRequest->user_agent->contains('(BB10;') || $httpRequest->user_agent->contains('(PlayBook'));
 	}
 	
 	public function applyConclusiveMatch() {
@@ -54,6 +54,8 @@ class BlackBerryUserAgentMatcher extends UserAgentMatcher {
 			$tolerance = $this->userAgent->secondSlash();
 		} else if ($this->userAgent->startsWith('Mozilla/5')) {
 			$tolerance = $this->userAgent->ordinalIndexOf(';', 3);
+		} else if ($this->userAgent->contains('PlayBook')) {
+			$tolerance = $this->userAgent->firstCloseParen();
 		} else {
 			$tolerance = $this->userAgent->firstSlash();
 		}
@@ -68,6 +70,8 @@ class BlackBerryUserAgentMatcher extends UserAgentMatcher {
 			} else {
 				return 'blackberry_generic_ver10_tablet';
 			}
+		} elseif ($this->userAgent->contains('PlayBook')) {
+            return "rim_playbook_ver1";
 		} else if (preg_match('#Black[Bb]erry[^/\s]+/(\d.\d)#', $this->userAgent, $matches)) {
 			$version = $matches[1];
 			foreach (self::$constantIDs as $vercode => $deviceID) {

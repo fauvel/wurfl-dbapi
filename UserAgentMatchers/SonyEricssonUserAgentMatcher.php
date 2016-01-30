@@ -29,11 +29,11 @@ class SonyEricssonUserAgentMatcher extends UserAgentMatcher {
 	public function applyConclusiveMatch() {
 		// firstSlash() - 1 because some UAs have revisions that aren't getting detected properly:
 		// SonyEricssonW995a/R1FA Browser/NetFront/3.4 Profile/MIDP-2.1 Configuration/CLDC-1.1 JavaPlatform/JP-8.4.3
-		$tolerance = $this->userAgent->firstSlash() - 1;
+		$tolerance = $this->userAgent->firstSlash() - 2;
 		if ($this->userAgent->startsWith('SonyEricsson')) {
 			return $this->risMatch($tolerance);
 		}
 		$tolerance = $this->userAgent->secondSlash();
-		return $this->risMatch($tolerance);
+        return $this->risMatch($tolerance);
 	}
 }

@@ -226,47 +226,42 @@ class TeraWurflHttpRequestHeader {
 		return substr_count($this->_normalized, '/');
 	}
 	/**
-	 * The character position of the first slash.  If there are no slashes, returns string length
-	 * @return int Character position
+	 * The character position of the first slash included.  If there are no slashes, returns null
+	 * @return null|int Character position
 	 */
 	public function firstSlash() {
-		$position = strpos($this->_normalized, '/');
-		return ($position !== false)? $position: strlen($this->_normalized);
+		return $this->findCharPosition($this->_normalized, '/');
 	}
+
 	/**
-	 * The character position of the second slash.  If there is no second slash, returns string length
-	 * @return int Character position
+	 * The character position of the second slash included.  If there is no second slash, returns null
+	 * @return null|int Character position
 	 */
 	public function secondSlash() {
-		$first = strpos($this->_normalized, '/');
-		$first++;
-		$position = strpos($this->_normalized, '/', $first);
-		return ($position !== false)? $position: strlen($this->_normalized);
+        return $this->findCharPosition($this->_normalized, '/', $this->firstSlash());
 	}
 	/**
-	 * The character position of the first space.  If there are no spaces, returns string length
-	 * @return int Character position
+	 * The character position of the first space included.  If there are no spaces, returns null
+	 * @return null|int Character position
 	 */
 	public function firstSpace() {
-		$position = strpos($this->_normalized, ' ');
-		return ($position !== false)? $position: strlen($this->_normalized);
+        return $this->findCharPosition($this->_normalized, ' ');
 	}
 	/**
-	 * The character position of the first open parenthesis.  If there are no open parenthesis, returns string length
-	 * @return int Character position
+	 * The character position of the first open parenthesis included.  If there are no open parenthesis, returns null
+	 * @return null|int Character position
 	 */
 	public function firstOpenParen() {
-		$position = strpos($this->_normalized, '(');
-		return ($position !== false)? $position: strlen($this->_normalized);
+        return $this->findCharPosition($this->_normalized, '(');
 	}
     /**
-     * The character position of the first close parenthesis.  If there are no close parenthesis, returns string length
-     * @return int Character position
+     * The character position of the first close parenthesis included.  If there are no close parenthesis, returns null
+     * @return null|int Character position
      */
     public function firstCloseParen() {
-        $position = strpos($this->_normalized, ')');
-        return ($position !== false)? $position: strlen($this->_normalized);
+        return $this->findCharPosition($this->_normalized, ')');
     }
+
 	/**
 	 * Returns the character position of the $target string, starting from $startingIndex
 	 * @param string $target
@@ -327,4 +322,18 @@ class TeraWurflHttpRequestHeader {
 		} while ($found < $ordinal);
 		return $index;
 	}
+
+    /**
+     * The character position in a string.  If not present, returns null
+     * @param $string
+     * @param $char
+     * @param $start_at
+     * @return null|int
+     */
+    private function findCharPosition($string, $char, $start_at = 0)
+    {
+        $position = strpos($string, $char, $start_at);
+
+        return ($position !== false) ? $position + 1 : null;
+    }
 }
