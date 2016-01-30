@@ -133,6 +133,7 @@ abstract class UserAgentMatcher {
      * @return string WURFL ID
      */
     public function risMatch($tolerance) {
+        if ($tolerance === null) return WurflConstants::NO_MATCH;
     	if ($this->simulation) return WurflConstants::NO_MATCH;
     	if ($this->wurfl->db->db_implements_ris) {
     		return $this->wurfl->db->getDeviceFromUA_RIS($this->userAgent->normalized, $tolerance, $this);

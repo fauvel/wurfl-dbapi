@@ -34,36 +34,13 @@ class KindleUserAgentMatcher extends UserAgentMatcher {
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		
-		if ($httpRequest->user_agent->contains("Android") && $httpRequest->user_agent->contains("/Kindle")) {
+		if ($httpRequest->user_agent->contains("Android") && $httpRequest->user_agent->contains(array('/Kindle', 'Silk'))) {
 			return false;
 		}
 		return $httpRequest->user_agent->contains(array('Kindle', 'Silk'));
 	}
 	
 	public function applyConclusiveMatch() {
-		// Mobile-mode Kindle Fire
-		if ($this->userAgent->contains('Android')) {
-			$model = AndroidUserAgentMatcher::getAndroidModel($this->userAgent, false);
-			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
-			if ($model !== null && $version !== null) {
-				$prefix = $version.' '.$model.WurflConstants::RIS_DELIMITER;
-				$this->userAgent->set($prefix.$this->userAgent);
-				return $this->risMatch(strlen($prefix));
-			} else {
-				
-				$search = 'Silk/';
-				$idx = strpos($this->userAgent, $search);
-				if ($idx !== false) {
-					// The model will be null for Kindle Fire 1st Gen Silk in mobile mode:
-					// Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; Silk/1.0.13.328_10008910) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 Silk-Accelerated=true
-					
-					// Currently, only the original Kindle Fire in Mobile Mode sends an Android UA with the Silk keyword and without model information
-					$tolerance = $idx + strlen($search) + 1;
-					return $this->risMatch($tolerance);
-				}
-			}
-		}
-		
 		// Desktop-mode Kindle Fire
 		// Kindle Fire 2nd Gen Desktop Mode has no android version (even though "Build/I...." tells us it's ICS):
 		// Mozilla/5.0 (Linux; U; en-us; KFOT Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Silk/2.0 Safari/535.19 Silk-Accelerated=false

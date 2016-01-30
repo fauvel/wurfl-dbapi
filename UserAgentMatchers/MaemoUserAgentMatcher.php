@@ -41,7 +41,7 @@ class MaemoUserAgentMatcher extends UserAgentMatcher {
 			return $this->risMatch(strlen($prefix));
 		}
 
-        return $this->risMatch($this->userAgent->firstSlash());
+		return $this->risMatch($this->userAgent->firstSlash());
 	}
 
 	public function applyRecoveryMatch() {

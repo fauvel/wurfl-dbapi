@@ -20,6 +20,13 @@
  * @package TeraWurflUserAgentMatchers
  */
 class OperaMiniUserAgentMatcher extends UserAgentMatcher {
+    
+    /**
+     * This flag tells the WurflLoader that the User Agent may be permanantly
+     * altered during matching
+     * @var boolean
+     */
+    public $runtime_normalization = true;
 	
 	public static $constantIDs = array(
 		'Opera Mini/1' => 'generic_opera_mini_version1',
@@ -33,11 +40,18 @@ class OperaMiniUserAgentMatcher extends UserAgentMatcher {
 	
 	public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 		if ($httpRequest->isDesktopBrowser()) return false;
-		return $httpRequest->user_agent->contains(array('Opera Mini', 'Opera Mobi'));
+		return $httpRequest->user_agent->contains(array('Opera Mini', 'OperaMini', 'Opera Mobi', 'OperaMobi'));
 	}
 	
 	public function applyConclusiveMatch() {
-		$opera_mini_idx = $this->userAgent->indexOf('Opera Mini');
+	    $model = self::getOperaModel($this->userAgent, false);
+    
+	    if ($model !== null) {
+	        $prefix = $model.WurflConstants::RIS_DELIMITER;
+	        $this->userAgent->set($prefix.$this->userAgent);
+	        return $this->risMatch(strlen($prefix));
+	    }
+	    $opera_mini_idx = $this->userAgent->indexOf('Opera Mini');
 		if ($opera_mini_idx !== false) {
 			// Match up to the first '.' after 'Opera Mini'
 			$tolerance = $this->userAgent->indexOf('.', $opera_mini_idx);
@@ -59,5 +73,17 @@ class OperaMiniUserAgentMatcher extends UserAgentMatcher {
 			return 'generic_opera_mini_version4';
 		}
 		return 'generic_opera_mini_version1';
+	}
+	
+	/**
+	 * Get the model name from the provided user agent or null if it cannot be determined
+	 * @param string $ua
+	 * @param string $use_default
+	 * @return NULL|string
+	 */
+	public static function getOperaModel($ua, $use_default=true) {
+	    if (preg_match('#^Opera/[\d\.]+ .+?\d{3}X\d{3} (.+)$#', $ua, $matches)) {
+	        return $matches[1];
+	    }
 	}
 }

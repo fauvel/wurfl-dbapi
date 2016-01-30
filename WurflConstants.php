@@ -31,6 +31,7 @@ class WurflConstants {
 	const GENERIC_XHTML = 'generic_xhtml';
 	const GENERIC_SMARTTV = 'generic_smarttv_browser';
 	const GENERIC_WEB_BROWSER = 'generic_web_browser';
+	const GENERIC_WEB_CRAWLER = 'generic_web_crawler';
 	const SIMPLE_DESKTOP_UA = 'HighPerformanceMatcher/';
 	const RIS_DELIMITER = '---';
 	/**#@-*/
@@ -215,6 +216,11 @@ class WurflConstants {
 		'large screen',
 		'netcast',
 		'philipstv',
+	    'digital-tv',
+	    ' mb90/',
+	    ' mb91/',
+	    ' mb95/',
+	    'vizio-dtv',
 	);
 
 	/**

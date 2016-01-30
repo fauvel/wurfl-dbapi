@@ -35,7 +35,7 @@ class SamsungUserAgentMatcher extends UserAgentMatcher {
 		} else {
 			$tolerance = $this->userAgent->secondSlash();
 		}
-		return $this->risMatch($tolerance);
+        return $this->risMatch($tolerance);
 	}
 	
 	public function applyRecoveryMatch() {

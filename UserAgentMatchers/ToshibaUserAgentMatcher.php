@@ -28,6 +28,6 @@ class ToshibaUserAgentMatcher extends UserAgentMatcher {
 	
 	public function applyConclusiveMatch() {
 		$tolerance = $this->userAgent->firstSlash();
-		return $this->risMatch($tolerance);
+        return $this->risMatch($tolerance);
 	}
 }

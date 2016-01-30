@@ -127,8 +127,7 @@ SECURITY
 
 EXAMPLE
 Here is a very simple example:
-
-```php
+<?php
 // Include the Tera-WURFL file
 require_once('./TeraWurfl.php');
 
@@ -150,7 +149,7 @@ echo "Markup: ".$wurflObj->getDeviceCapability("preferred_markup");
 $width = $wurflObj->getDeviceCapability("resolution_width");
 $height = $wurflObj->getDeviceCapability("resolution_height");
 echo "<br/>Resolution: $width x $height<br/>";
-```
+?>
 
 The complete list of capabilities is available here:
 http://wurfl.sourceforge.net/help_doc.php#product_info

@@ -36,7 +36,7 @@ class KddiUserAgentMatcher extends UserAgentMatcher {
 		} else {
 			$tolerance = $this->userAgent->firstSlash();
 		}
-		return $this->risMatch($tolerance);
+        return $this->risMatch($tolerance);
 	}
 	
 	public function applyRecoveryMatch() {
