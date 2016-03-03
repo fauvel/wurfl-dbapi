@@ -1,5 +1,12 @@
 ScientiaMobile WURFL Database API (formerly Tera-WURFL) change log:
 
+[2015.02.08] ScientiaMobile Database API 1.7.0.0
+- Added WURFL.XML deviceIds consistency check
+- Improved detection of:
+    - Apple devices
+    - Edge browser
+- Added new Virtual Capability: device_name
+
 [2015.12.16] ScientiaMobile Database API 1.6.4.1
 - Added mandatory capabilities for advertised capabilities
 

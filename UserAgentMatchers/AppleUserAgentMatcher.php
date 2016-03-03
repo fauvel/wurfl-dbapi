@@ -155,6 +155,16 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	    'apple_ipad_ver1_sub9_2_subhwmini3',
 	    'apple_ipad_ver1_sub9_2_subhwmini4',
 	    'apple_ipad_ver1_sub9_2_subhwpro',
+	    'apple_ipad_ver1_sub9_3_subhw2',
+	    'apple_ipad_ver1_sub9_3_subhw3',
+	    'apple_ipad_ver1_sub9_3_subhw4',
+	    'apple_ipad_ver1_sub9_3_subhwair',
+	    'apple_ipad_ver1_sub9_3_subhwair2',
+	    'apple_ipad_ver1_sub9_3_subhwmini1',
+	    'apple_ipad_ver1_sub9_3_subhwmini2',
+	    'apple_ipad_ver1_sub9_3_subhwmini3',
+	    'apple_ipad_ver1_sub9_3_subhwmini4',
+	    'apple_ipad_ver1_sub9_3_subhwpro',
 		
 		'apple_iphone_ver1_subhw2g',
 		'apple_iphone_ver2_subhw2g',
@@ -264,7 +274,15 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	    'apple_iphone_ver9_2_subhw6plus',
 	    'apple_iphone_ver9_2_subhw6s',
 	    'apple_iphone_ver9_2_subhw6splus',
-
+	    'apple_iphone_ver9_3_subhw4s',
+	    'apple_iphone_ver9_3_subhw5',
+	    'apple_iphone_ver9_3_subhw5s',
+	    'apple_iphone_ver9_3_subhw5c',
+	    'apple_iphone_ver9_3_subhw6',
+	    'apple_iphone_ver9_3_subhw6plus',
+	    'apple_iphone_ver9_3_subhw6s',
+	    'apple_iphone_ver9_3_subhw6splus',
+	    
 		'apple_ipod_touch_ver1_subhw1',
 		'apple_ipod_touch_ver2_subhw1',
 		'apple_ipod_touch_ver2_1_subhw1',
@@ -308,6 +326,8 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver9_1_subhw6',
 	    'apple_ipod_touch_ver9_2_subhw5',
 	    'apple_ipod_touch_ver9_2_subhw6',
+	    'apple_ipod_touch_ver9_3_subhw5',
+	    'apple_ipod_touch_ver9_3_subhw6',
 	);
 	
 	// iOS hardware mappings

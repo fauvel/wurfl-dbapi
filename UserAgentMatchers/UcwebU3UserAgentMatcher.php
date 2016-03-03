@@ -97,7 +97,7 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 	
 		// iPhone U3K
 		else if ($this->userAgent->contains('iPhone;')) {
-			if (preg_match('/iPhone OS (\d+)(?:_(\d+))?(?:_\d+)* like/', $this->userAgent, $matches)) {
+			if (preg_match('/iPhone OS (\d+)_(\d+)(?:_\d+)* like/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$prefix = "$version U3iPhone $ucb_version".WurflConstants::RIS_DELIMITER;
 				$this->userAgent->set($prefix.$this->userAgent);
@@ -107,7 +107,7 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 			
 		// iPad U3K
 		else if ($this->userAgent->contains('iPad')) {
-			if (preg_match('/CPU OS (\d)_?(\d)?.+like Mac.+; iPad([0-9,]+)\) AppleWebKit/', $this->userAgent, $matches)) {
+			if (preg_match('/CPU OS (\d+)_(\d+)?.+like Mac.+; iPad([0-9,]+)\) AppleWebKit/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$model = $matches[3];
 				$prefix = "$version U3iPad $ucb_version $model".WurflConstants::RIS_DELIMITER;

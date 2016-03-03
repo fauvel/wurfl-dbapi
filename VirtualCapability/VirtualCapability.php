@@ -394,6 +394,27 @@ class VirtualCapability_CompleteDeviceName extends VirtualCapability {
 	}
 }
 
+class VirtualCapability_DeviceName extends VirtualCapability {
+
+    protected $required_capabilities = array(
+        'brand_name',
+        'model_name',
+        'marketing_name',
+    );
+
+    protected function compute() {
+        $parts = array($this->wurfl->brand_name);
+        if (strlen($this->wurfl->marketing_name)) {
+            $parts[] = $this->wurfl->marketing_name;
+            return implode(' ', $parts);
+        }
+        if (strlen($this->wurfl->model_name)) {
+            $parts[] = $this->wurfl->model_name;
+        }
+        return implode(' ', $parts);
+    }
+}
+
 class VirtualCapability_FormFactor extends VirtualCapability {
 
 	protected $required_capabilities = array(

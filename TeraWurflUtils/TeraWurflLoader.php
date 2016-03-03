@@ -198,9 +198,7 @@ class TeraWurflLoader{
 		$required_devs[] = 'generic';
 		foreach ($required_devs as $id) {
 			if (!array_key_exists($id, $this->devices)) {
-				$message = "Missing required WURFL Device!: $id";
-				$this->wurfl->toLog($message, LOG_ERR);
-				$this->errors[] = $message;
+                throw new TeraWurflConsistencyException("wurfl.xml load error - you may need to update the wurfl.xml file to a more recent version");
 			}
 		}
 		

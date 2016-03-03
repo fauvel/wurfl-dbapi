@@ -3,7 +3,7 @@
     "description": "The WURFL OnSite DB API",
     "license": "AGPLv3",
     "homepage": "http://wurfl.sourceforge.net/",
-    "version": "1.6.4.1",
+    "version": "1.7.0.0",
     "authors": [
         {
             "name": "ScientiaMobile, Inc",
@@ -18,8 +18,9 @@
         "classmap": ["TeraWurfl.php"]
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "phing/phing": "~2"
+        "phpunit/phpunit": "^4.8",
+        "phing/phing": "2.7.*",
+        "pear/archive_tar": "^1.4"
     },
     "require": {
         "php": ">=5.3.0"

@@ -27,3 +27,4 @@ class TeraWurflInvalidCapabilityException extends TeraWurflException {}
 class TeraWurflDatabaseException extends TeraWurflException {}
 class TeraWurflCLIInvalidArgumentException extends TeraWurflException {}
 class TeraWurflUpdateDownloaderException extends TeraWurflException {}
+class TeraWurflConsistencyException extends TeraWurflException {}
