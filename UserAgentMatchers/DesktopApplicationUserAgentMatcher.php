@@ -38,7 +38,7 @@ class DesktopApplicationUserAgentMatcher extends UserAgentMatcher {
 		
 		public static function canHandle(TeraWurflHttpRequest $httpRequest) {
 			if ($httpRequest->isMobileBrowser()) return false;
-			return $httpRequest->user_agent->contains(array('Thunderbird', 'Microsoft Outlook', 'MSOffice'));
+			return $httpRequest->user_agent->contains(array('Thunderbird', 'Microsoft Outlook', 'MSOffice', 'DesktopApp '));
 		}
 		
 		public function applyConclusiveMatch() {
@@ -70,15 +70,14 @@ class DesktopApplicationUserAgentMatcher extends UserAgentMatcher {
 		public function applyRecoveryMatch() {
 			if ($this->userAgent->contains('Thunderbird')) {
 				return 'mozilla_thunderbird';
-			}
-			
-			else if ($this->userAgent->contains('Microsoft Outlook')) {
+			} else if ($this->userAgent->contains('Microsoft Outlook')) {
 				return 'ms_outlook';
+			} else if ($this->userAgent->contains('MSOffice')) {
+				return 'ms_office';
+			} else if ($this->userAgent->contains('DesktopApp ')) {
+				return 'generic_desktop_application';
 			}
 			
-			else if ($this->userAgent->contains('MSOffice')) {
-				return 'ms_office';
-			}
 			
 			return WurflConstants::GENERIC_WEB_BROWSER;
 			

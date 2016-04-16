@@ -58,54 +58,6 @@ class UserAgentUtils {
         }
         return WurflConstants::NO_MATCH;
 	}
-	/**
-	 * Find the matching Device ID for a given User Agent using LD (Leveshtein Distance)
-	 * @param string $ua User Agent
-	 * @param int $tolerance Tolerance that is still considered a match
-	 * @param UserAgentMatcher $matcher The UserAgentMatcher instance that is matching the User Agent
-	 * @return string WURFL ID
-	 */
-	public static function ldMatch($ua, $tolerance=null, $matcher) {
-		// PHP Leveshtein Distance Function
-		if (is_null($tolerance)) {
-			$tolerance = self::$WORST_MATCH;
-		}
-		$devices =& $matcher->deviceList;
-		$key = array_search($ua,$devices);
-		if ($key !== false) {
-			return $key;
-		}
-		$best = $tolerance;
-		
-		$match = WurflConstants::NO_MATCH;
-
-        $needle_chars = count_chars($ua);
-
-		foreach ($devices as $testID => $testUA) {
-
-            $ua_chars = count_chars($testUA);
-            $sum = 0;
-            $can_apply_ld = true;
-
-            //Check from 32 (space) to 122 ('z')
-            for ($i = 32; $i < 122; $i++) {
-                $sum += abs($ua_chars[$i] - $needle_chars[$i]);
-                if ($sum > 2 * $tolerance) {
-                    $can_apply_ld = false;
-                    break;
-                }
-            }
-            if ($can_apply_ld === true) {
-                $current = @levenshtein($ua, $testUA);
-                //if(strlen($ua) > 255 || strlen($testUA) > 255) echo "<pre>$ua\n$testUA</pre><hr/>";
-                if ($current <= $best) {
-                    $best = $current;
-                    $match = $testID;
-                }
-            }
-		}
-		return $match;
-	}
     /**
      * Checks for traces of mobile device signatures and returns an appropriate generic WURFL Device ID
      * @param TeraWurflHttpRequest $httpRequest HTTP Request

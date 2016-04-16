@@ -29,6 +29,7 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 	public function normalize(TeraWurflHttpRequestHeader $http_header) {
 		$this->_user_agent = $http_header;
 		$this->_user_agent->cleaned = trim($this->_user_agent->cleaned);
+		$this->removeIISLogging();
 		$this->normalizeUCWEB();
 		$this->removeUPLink();
 		$this->normalizeSerialNumbers();
@@ -103,6 +104,13 @@ class GenericUserAgentNormalizer implements IHttpHeaderNormalizer {
 	 */
 	protected function removeVodafonePrefix() {
 		$this->_user_agent->cleaned = preg_replace('/^Vodafone\/(\d\.\d\/)?/', '', $this->_user_agent->cleaned, 1);
+	}
+	
+	protected function removeIISLogging() {
+        //If there are no spaces in a UA and more than 2 plus symbols, the UA is likely affected by IIS style logging issues 
+	    if (substr_count($this->_user_agent->cleaned, ' ') === 0 and substr_count($this->_user_agent->cleaned, '+') > 2) {
+	        $this->_user_agent->cleaned = str_replace('+', ' ', $this->_user_agent->cleaned);
+	    }
 	}
 
 }

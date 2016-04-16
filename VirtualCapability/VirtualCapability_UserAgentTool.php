@@ -297,6 +297,29 @@ class VirtualCapability_UserAgentTool {
 		//Final ditch effort
 		if ($device->browser->setRegex($device->browser_ua, '/(?:MIDP.+?CLDC)|(?:UNTRUSTED)|(?:MIDP-2.0)/', 'Java Applet')) return $device;
 		
+		// Desktop Apps
+		/*
+		 * Windows:
+		 * Mozilla/5.0 (Windows NT <NT OS version>; <Platform - x86 or x64 - Optional>) AppleWebKit/537.36 (KHTML, like Gecko) DesktopApp <Brand>/<App Version> Safari/537.36
+		 * Linux:
+		 * Mozilla/5.0 (X11; Linux <Platform - x86_64 or x64 - Optional>) AppleWebKit/537.36 (KHTML, like Gecko) DesktopApp <Brand>/<App Version> Safari/537.36
+		 * Mac OS X:
+		 * Mozilla/5.0 (Macintosh; Intel Mac OS X <OS version>) AppleWebKit/537.36 (KHTML, like Gecko) DesktopApp <Brand>/<App Version> Safari/537.36
+		 * 
+		 */
+		if (strpos($device->device_ua, 'DesktopApp') !== false) {
+		    // Mac
+		    if ($device->os->setRegex($device->device_ua, '#^Mozilla/[0-9]\.0 \(Macintosh;(?: U;)?([a-zA-Z_ \.0-9]+)(?:;)?.+? DesktopApp ([A-Za-z0-9]+)/([\d\.]+)\.?#', 1)) {
+		        $device->browser->set($device->os->getLastRegexMatch(2)." Desktop Application", $device->os->getLastRegexMatch(3));
+		        return $device;
+		    }
+		    	
+		    // Windows and Linux
+		    if ($device->os->setRegex($device->device_ua, '#^Mozilla/[0-9]\.0 \((?:Windows;|X11;)?(?: U; )?([a-zA-Z_ \.0-9]+)(?:;)?.+? DesktopApp ([A-Za-z0-9]+)/([\d\.]+)\.?#', 1)) {
+		        $device->browser->set($device->os->getLastRegexMatch(2)." Desktop Application", $device->os->getLastRegexMatch(3));
+		        return $device;
+		    }
+		}
 		
 		// Desktop Browsers
 
@@ -376,6 +399,21 @@ class VirtualCapability_UserAgentTool {
 
 			$device->browser->set('Safari', $device->os->getLastRegexMatch(2));
 			return $device;
+		}
+		
+        //PaleMoon - Must be above FireFox
+		if (strpos($device->device_ua, 'PaleMoon') !== false) {
+		    //PaleMoon - Windows
+		    if ($device->os->setRegex($device->device_ua, '/^Mozilla\/[0-9]\.0 .+(Windows [0-9A-Za-z \.]+;).+?rv:.+?PaleMoon\/([\d\.]+)/', 1)) {
+		        $device->browser->set('PaleMoon', $device->os->getLastRegexMatch(2));
+		        return $device;
+		    }
+		    	
+		    // Palemon - Mac/Linux
+		    if ($device->os->setRegex($device->device_ua, '/^Mozilla\/[0-9]\.0 \((?:X11|Macintosh); (?:U; |Ubuntu; |)((?:Intel|PPC|Linux) [a-zA-Z0-9\- \._\(\)]+);.+?rv:.+?PaleMoon\/([\d\.]+)/', 1)) {
+		        $device->browser->set('PaleMoon', $device->os->getLastRegexMatch(2));
+		        return $device;
+		    }
 		}
 		
 		if (strpos($device->device_ua, 'Firefox') !== false) {

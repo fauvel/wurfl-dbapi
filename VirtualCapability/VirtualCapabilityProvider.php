@@ -112,6 +112,19 @@ class VirtualCapabilityProvider {
 		
 		return $caps;
 	}
+
+	/**
+	 * Returns an array of all the control capabilities
+	 * @return array
+	 */
+	public static function getControlCapabilities()
+	{
+		$caps = array();
+		foreach (self::$virtual_capabilities as $cap_name => $vc_name) {
+			$caps[] = self::PREFIX_CONTROL . $cap_name;
+		}
+		return $caps;
+	}
 	
 	/**
 	 * Gets an array of all the virtual capabilities

@@ -93,6 +93,11 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 			return WurflConstants::NO_MATCH;
 		}
 		
+		//Use length of UA as tolerance if model is absent, to prevent false positives
+		if ($model === null) {
+		    return $this->risMatch(strlen($this->userAgent));
+		}
+		
 		// Standard RIS Matching
 		$tolerance = $this->userAgent->indexOfOrLength(array(' Build/', ' AppleWebKit'));
 		return $this->risMatch($tolerance);
@@ -183,17 +188,20 @@ class AndroidUserAgentMatcher extends UserAgentMatcher {
 	public static function getAndroidModel($ua, $use_default=true) {
 		// Normalize spaces in UA before capturing parts
 		$ua = preg_replace('|;(?! )|', '; ', $ua);
-		// Different logic for Mozillite and non-Mozillite UAs to isolate model name
-		// Non-Mozillite UAs get first preference
-		if (preg_match('#(^[A-Za-z0-9_\-\+ ]+)[/ ]?(?:[A-Za-z0-9_\-\+\.]+)? +Linux/[0-9\.]+ +Android[ /][0-9\.]+ +Release/[0-9\.]+#', $ua, $matches)) {
-			// Trim off spaces and semicolons
+
+		// Logic to detect some Gionee UAs like: (must remain above the regular model name extracting regex)
+		// Mozilla/5.0 (Linux; U; Android 4.2.2; zh-cn; Build/JDQ39 ) AppleWebKit/534.30 (KHTML,like Gecko) Version/4.2.2 Mobile Safari/534.30 GiONEE-GN9000/GN9000 RV/4.2.8 GNBR/5.0.0.v Id/0470FB91EE7E5465B21531B855F06353
+		if (preg_match('#Mobile Safari/[\d\.]+ (GiONEE-[A-Za-z0-9]+)/#', $ua, $matches)) {
+			$model = $matches[1];
+        // Different logic for Mozillite and non-Mozillite UAs to isolate model name
+        // Non-Mozillite UAs get first preference
+		} else if (preg_match('#(^[A-Za-z0-9_\-\+ ]+)[/ ]?(?:[A-Za-z0-9_\-\+\.]+)? +Linux/[0-9\.\+]+ +Android[ /][0-9\.]+ +Release/[0-9\.]+#', $ua, $matches)) {
+            // Trim off spaces and semicolons
 			$model = rtrim($matches[1], ' ;');
-			
 		// Locales are optional for matching model name since UAs like Chrome Mobile do not contain them
 		} else if (preg_match('#Android [^;]+;(?>(?: xx-xx[ ;]+)?)(.+?)(?:Build/|\))#', $ua, $matches)) {
 			// Trim off spaces and semicolons
 			$model = rtrim($matches[1], ' ;');
-			
 		// Additional logic to capture model names in Amazon webview/appstore UAs
 		} else if (preg_match('#^(?:AmazonWebView|Appstore|Amazon\.com)/.+Android[/ ][\d\.]+/(?:[\d]+/)?([A-Za-z0-9_\- ]+)\b#', $ua, $matches)) {
 			$model = $matches[1];

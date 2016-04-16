@@ -3,7 +3,7 @@
     "description": "The WURFL OnSite DB API",
     "license": "AGPLv3",
     "homepage": "http://wurfl.sourceforge.net/",
-    "version": "1.7.0.0",
+    "version": "1.7.1.0",
     "authors": [
         {
             "name": "ScientiaMobile, Inc",

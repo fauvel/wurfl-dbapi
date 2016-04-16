@@ -112,8 +112,8 @@ class TeraWurfl{
 	 * The installed version of Tera-WURFL
 	 * @var string
 	 */
-	public $release_version = "1.7.0.0";
-	public $historical_release_version = "2.4.0";
+	public $release_version = "1.7.1.0";
+	public $historical_release_version = "2.4.1";
 	/**
 	 * The required version of PHP for this release
 	 * @var string
@@ -209,26 +209,28 @@ class TeraWurfl{
 		$this->foundInCache = false;
 		$this->capabilities = array();
 		$this->flat_capabilities = array();
-		// Use the ultra high performance SimpleDesktopMatcher if enabled
-		if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE) {
-			require_once realpath(dirname(__FILE__).'/UserAgentMatchers/SimpleDesktopUserAgentMatcher.php');
-			if (SimpleDesktopUserAgentMatcher::isDesktopBrowserHeavyDutyAnalysis($this->httpRequest)) {
-				$this->httpRequest->user_agent->set(WurflConstants::SIMPLE_DESKTOP_UA);
-			}
-		}
-		// Check cache for device
-		if (TeraWurflConfig::$CACHE_ENABLE) {
-			$cacheData = $this->db->getDeviceFromCache($this->httpRequest->user_agent->cleaned);
-			// Found in cache
-			if ($cacheData !== false) {
-				$this->capabilities = $cacheData;
-				$this->foundInCache = true;
-				$deviceID = $cacheData['id'];
-			}
-		}
+
+        // Check cache for device
+        if (TeraWurflConfig::$CACHE_ENABLE) {
+            $cacheData = $this->db->getDeviceFromCache($this->httpRequest->user_agent->original);
+            // Found in cache
+            if ($cacheData !== false) {
+                $this->capabilities = $cacheData;
+                $this->foundInCache = true;
+            }
+        }
+
 		$this->virtual_cap_provider = new VirtualCapabilityProvider($this);
+
 		if (!$this->foundInCache) {
-			require_once realpath(dirname(__FILE__).'/UserAgentMatchers/SimpleDesktopUserAgentMatcher.php');
+            require_once realpath(dirname(__FILE__).'/UserAgentMatchers/SimpleDesktopUserAgentMatcher.php');
+            // Use the ultra high performance SimpleDesktopMatcher if enabled
+            if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE) {
+                if (SimpleDesktopUserAgentMatcher::isDesktopBrowserHeavyDutyAnalysis($this->httpRequest)) {
+                    $this->httpRequest->user_agent->set(WurflConstants::SIMPLE_DESKTOP_UA);
+                }
+            }
+
 			// Find appropriate user agent matcher
 			$this->userAgentMatcher = UserAgentMatcherFactory::createUserAgentMatcher($this, $this->httpRequest);
 			// Find the best matching WURFL ID
@@ -241,11 +243,13 @@ class TeraWurfl{
 			$this->matchData['lookup_time'] = $this->lookup_end - $this->lookup_start;
 			// Add the match data to the capabilities array so it gets cached
 			$this->addCapabilities(array($this->matchDataKey => $this->matchData));
+
+            if (TeraWurflConfig::$CACHE_ENABLE==true) {
+                // Since this device was not cached, cache it now.
+                $this->db->saveDeviceInCache($this->httpRequest->user_agent->original, $this->capabilities);
+            }
 		}
-		if (TeraWurflConfig::$CACHE_ENABLE==true && !$this->foundInCache) {
-			// Since this device was not cached, cache it now.
-			$this->db->saveDeviceInCache($this->httpRequest->user_agent->cleaned, $this->capabilities);
-		}
+
 		$this->flattenCapabilities();
 		return $this->capabilities[$this->matchDataKey]['match'];
 	}
@@ -360,13 +364,15 @@ class TeraWurfl{
 		return $this->flat_capabilities[$capability];
 	}
 	/**
-	 * Gets an array of all the available capability names, not including virtual capabilities.
+	 * Gets an array of all the available capability names, not including virtual capabilities and control_caps
 	 * Only available after looking up at least one device
 	 * @return array
 	 */
 	public function getLoadedCapabilityNames() {
 		if ($this->flat_capabilities === null) $this->flattenCapabilities();
-		return array_keys($this->flat_capabilities);
+		$capabilities = array_keys($this->flat_capabilities);
+		$capabilities = array_diff($capabilities, VirtualCapabilityProvider::getControlCapabilities());
+		return $capabilities;
 	}
 	/**
 	 * Returns the value of the given setting name
