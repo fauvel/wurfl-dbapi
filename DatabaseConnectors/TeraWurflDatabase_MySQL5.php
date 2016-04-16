@@ -49,7 +49,6 @@ class TeraWurflDatabase_MySQL5 extends TeraWurflDatabase{
 	protected static $WURFL_ID_COLUMN_TYPE = "VARCHAR";
 	protected static $WURFL_ID_MAX_LENGTH = 64;
 	protected static $STORAGE_ENGINE = "MyISAM";
-	// To use InnoDB for this setting, you need to remove DELAYED from the cache query
 	protected static $CACHE_STORAGE_ENGINE = "MyISAM";
 	protected static $PERSISTENT_CONNECTION = true;
 
@@ -208,9 +207,6 @@ ORDER BY parent.`rt`",
 			foreach($devices as $device){
 				$this->dbcon->query("INSERT INTO `".TeraWurflConfig::$TABLE_PREFIX.'Index'."` (`deviceID`,`matcher`) VALUE (".$this->SQLPrep($device['id']).",".$this->SQLPrep($matcher).")");
 				// convert device root to tinyint format (0|1) for db
-				if(strlen($device['user_agent']) > 255){
-					$device['user_agent'] = substr($device['user_agent'], 0, 255);
-				}
 				$insertcache[] = sprintf("(%s,%s,%s,%s,%s,%s)",
 					$this->SQLPrep($device['id']),
 					$this->SQLPrep($device['user_agent']),
@@ -319,7 +315,7 @@ ORDER BY parent.`rt`",
 		$droptable = "DROP TABLE IF EXISTS ".$tablename;
 		$createtable = "CREATE TABLE `".$tablename."` (
 			`deviceID` ".self::$WURFL_ID_COLUMN_TYPE."(".self::$WURFL_ID_MAX_LENGTH.") binary NOT NULL default '',
-			`user_agent` varchar(255) binary default NULL,
+			`user_agent` varchar(512) binary default NULL,
 			`fall_back` ".self::$WURFL_ID_COLUMN_TYPE."(".self::$WURFL_ID_MAX_LENGTH.") default NULL,
 			`actual_device_root` tinyint(1) default '0',
 			`match` tinyint(1) default '1',
@@ -427,7 +423,12 @@ ORDER BY parent.`rt`",
 		$ua = $this->SQLPrep($userAgent);
 		$packed_device = $this->SQLPrep(serialize($device));
 		$this->numQueries++;
-		if(!$this->dbcon->query("INSERT DELAYED INTO `$tablename` (`user_agent`,`cache_data`) VALUES ($ua,$packed_device)")) throw new Exception("Error: ".$this->dbcon->error);
+		if (self::$CACHE_STORAGE_ENGINE === 'MyISAM') {
+			if(!$this->dbcon->query("INSERT DELAYED INTO `$tablename` (`user_agent`,`cache_data`) VALUES ($ua,$packed_device)")) throw new Exception("Error: ".$this->dbcon->error);
+		} else {
+			if(!$this->dbcon->query("INSERT INTO `$tablename` (`user_agent`,`cache_data`) VALUES ($ua,$packed_device)")) throw new Exception("Error: ".$this->dbcon->error);
+		}
+
 		if($this->dbcon->affected_rows > 0){
 			return true;
 		}
@@ -437,7 +438,7 @@ ORDER BY parent.`rt`",
 		$tablename = TeraWurflConfig::$TABLE_PREFIX.'Cache';
 		$droptable = "DROP TABLE IF EXISTS `$tablename`";
 		$createtable = "CREATE TABLE `$tablename` (
-			`user_agent` varchar(255) binary NOT NULL default '',
+			`user_agent` varchar(512) binary NOT NULL default '',
 			`cache_data` mediumtext NOT NULL,
 			PRIMARY KEY  (`user_agent`)
 		) ENGINE=".self::$CACHE_STORAGE_ENGINE;
@@ -451,7 +452,7 @@ ORDER BY parent.`rt`",
 		$tablename = TeraWurflConfig::$TABLE_PREFIX.'Cache'.self::$DB_TEMP_EXT;
 		$droptable = "DROP TABLE IF EXISTS `$tablename`";
 		$createtable = "CREATE TABLE `$tablename` (
-			`user_agent` varchar(255) binary NOT NULL default '',
+			`user_agent` varchar(512) binary NOT NULL default '',
 			`cache_data` mediumtext NOT NULL,
 			PRIMARY KEY  (`user_agent`)
 		) ENGINE=".self::$CACHE_STORAGE_ENGINE;
@@ -517,11 +518,11 @@ ORDER BY parent.`rt`",
 		}
 	}
 	public function createProcedures(){
-		$TeraWurfl_RIS = "CREATE PROCEDURE `".TeraWurflConfig::$TABLE_PREFIX."_RIS`(IN ua VARCHAR(300), IN tolerance INT, IN matcher VARCHAR(64))
+		$TeraWurfl_RIS = "CREATE PROCEDURE `".TeraWurflConfig::$TABLE_PREFIX."_RIS`(IN ua VARCHAR(512), IN tolerance INT, IN matcher VARCHAR(64))
 BEGIN
 DECLARE curlen INT;
 DECLARE wurflid ".self::$WURFL_ID_COLUMN_TYPE."(".self::$WURFL_ID_MAX_LENGTH.") DEFAULT NULL;
-DECLARE curua VARCHAR(300);
+DECLARE curua VARCHAR(512);
 
 SELECT CHAR_LENGTH(ua)  INTO curlen;
 findua: WHILE ( curlen >= tolerance ) DO

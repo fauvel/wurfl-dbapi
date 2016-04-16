@@ -324,7 +324,7 @@ EOF;
 				}
 				break;
 			case "dumpBuckets":
-				echo "Database API v{$this->wurfl->release_version}; ".$this->wurfl->getSetting(TeraWurfl::$SETTING_WURFL_VERSION)."\n";
+				//echo "Database API v{$this->wurfl->release_version}; ".$this->wurfl->getSetting(TeraWurfl::$SETTING_WURFL_VERSION)."\n";
 				$this->wurfl->dumpBuckets();
 				break;
 			default:
@@ -332,6 +332,49 @@ EOF;
 				break;
 		}
 	}
+
+	protected function actionTestDeviceId(TeraWurflCLIArgument $arg)
+	{
+
+		$device = $this->wurfl->db->getDeviceFromID($arg->value);
+		$this->wurfl->getDeviceCapabilitiesFromAgent($device['user_agent']);
+		echo "Device ID: " . $this->wurfl->capabilities['id'] . PHP_EOL;
+		echo "UA: " . $this->wurfl->capabilities['user_agent'] . PHP_EOL;
+		echo "Fallback: " . $this->wurfl->capabilities['fall_back'] . PHP_EOL;
+
+		echo "Matched Device: " . $this->wurfl->capabilities['id'] . PHP_EOL;
+
+		var_export(array(
+			'original'=>$this->wurfl->httpRequest->user_agent->original,
+			'cleaned'=>$this->wurfl->httpRequest->user_agent->cleaned,
+			'normalized'=>$this->wurfl->httpRequest->user_agent->normalized,
+		));
+		echo PHP_EOL;
+		echo "Match Diagnostic Info: " . PHP_EOL;
+		var_export($this->wurfl->capabilities['tera_wurfl']);
+
+	}
+
+    protected function actionTestUserAgent(TeraWurflCLIArgument $arg)
+    {
+
+        $this->wurfl->getDeviceCapabilitiesFromAgent($arg->value);
+        echo "Device ID: " . $this->wurfl->capabilities['id'] . PHP_EOL;
+        echo "UA: " . $this->wurfl->capabilities['user_agent'] . PHP_EOL;
+        echo "Fallback: " . $this->wurfl->capabilities['fall_back'] . PHP_EOL;
+
+        echo "Matched Device: " . $this->wurfl->capabilities['id'] . PHP_EOL;
+
+        var_export(array(
+          'original'=>$this->wurfl->httpRequest->user_agent->original,
+          'cleaned'=>$this->wurfl->httpRequest->user_agent->cleaned,
+          'normalized'=>$this->wurfl->httpRequest->user_agent->normalized,
+        ));
+        echo PHP_EOL;
+        echo "Match Diagnostic Info: " . PHP_EOL;
+        var_export($this->wurfl->capabilities['tera_wurfl']);
+
+    }
 	
 	protected function actionHelp(TeraWurflCLIArgument $arg) {
 		$twversion = $this->wurfl->release_branch . " " . $this->wurfl->release_version;
@@ -359,6 +402,10 @@ Option                     Meaning
  --rebuildCache            Rebuild the device cache by redetecting all
                              cached devices using the current WURFL
  --stats                   Show statistics about the Database API
+ --testUserAgent=<user_agent>
+                           Run WURFL against the specified user_agent
+ --testDeviceId=<device_id>
+                           Run WURFL against the specified device_id
  --centralTest=<unit|regression|all|single/<test_name>>
                            Run tests from the ScientiaMobile Central
                              testing repository.

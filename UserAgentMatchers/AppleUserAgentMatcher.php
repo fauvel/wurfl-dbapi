@@ -28,7 +28,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	*/
 	public $runtime_normalization = true;
 	
-	public static $constantIDs = array(
+public static $constantIDs = array(
 		'apple_ipod_touch_ver1',
 		'apple_ipod_touch_ver2',
 		'apple_ipod_touch_ver3',
@@ -38,6 +38,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver7',
 		'apple_ipod_touch_ver8',
 		'apple_ipod_touch_ver9',
+	    'apple_ipod_touch_ver10',
 				
 		'apple_ipad_ver1',
 		'apple_ipad_ver1_subua32',
@@ -47,6 +48,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipad_ver1_sub7',
 		'apple_ipad_ver1_sub8',
 		'apple_ipad_ver1_sub9',
+	    'apple_ipad_ver1_sub10',
 				
 		'apple_iphone_ver1',
 		'apple_iphone_ver2',
@@ -57,6 +59,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_iphone_ver7',
 		'apple_iphone_ver8',
 		'apple_iphone_ver9',
+	    'apple_iphone_ver10',
 	
 		//iOS HW IDs
 		'apple_ipad_ver1_subhw1',
@@ -155,6 +158,17 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	    'apple_ipad_ver1_sub9_2_subhwmini3',
 	    'apple_ipad_ver1_sub9_2_subhwmini4',
 	    'apple_ipad_ver1_sub9_2_subhwpro',
+	    'apple_ipad_ver1_sub9_3_subhw2',
+	    'apple_ipad_ver1_sub9_3_subhw3',
+	    'apple_ipad_ver1_sub9_3_subhw4',
+	    'apple_ipad_ver1_sub9_3_subhwair',
+	    'apple_ipad_ver1_sub9_3_subhwair2',
+	    'apple_ipad_ver1_sub9_3_subhwmini1',
+	    'apple_ipad_ver1_sub9_3_subhwmini2',
+	    'apple_ipad_ver1_sub9_3_subhwmini3',
+	    'apple_ipad_ver1_sub9_3_subhwmini4',
+	    'apple_ipad_ver1_sub9_3_subhwpro',
+	    'apple_ipad_ver1_sub9_3_subhwpro97',
 		
 		'apple_iphone_ver1_subhw2g',
 		'apple_iphone_ver2_subhw2g',
@@ -264,7 +278,16 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	    'apple_iphone_ver9_2_subhw6plus',
 	    'apple_iphone_ver9_2_subhw6s',
 	    'apple_iphone_ver9_2_subhw6splus',
-
+	    'apple_iphone_ver9_3_subhw4s',
+	    'apple_iphone_ver9_3_subhw5',
+	    'apple_iphone_ver9_3_subhw5s',
+	    'apple_iphone_ver9_3_subhw5c',
+	    'apple_iphone_ver9_3_subhw6',
+	    'apple_iphone_ver9_3_subhw6plus',
+	    'apple_iphone_ver9_3_subhw6s',
+	    'apple_iphone_ver9_3_subhw6splus',
+	    'apple_iphone_ver9_3_subhwse',
+	    
 		'apple_ipod_touch_ver1_subhw1',
 		'apple_ipod_touch_ver2_subhw1',
 		'apple_ipod_touch_ver2_1_subhw1',
@@ -308,6 +331,8 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'apple_ipod_touch_ver9_1_subhw6',
 	    'apple_ipod_touch_ver9_2_subhw5',
 	    'apple_ipod_touch_ver9_2_subhw6',
+	    'apple_ipod_touch_ver9_3_subhw5',
+	    'apple_ipod_touch_ver9_3_subhw6',
 	);
 	
 	// iOS hardware mappings
@@ -329,6 +354,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'7,2' => '6',
 		'8,1' => '6s',
 		'8,2' => '6splus',
+	    '8,4' => 'se',
 	);
 	
 	public static $ipadDeviceMap = array(
@@ -359,6 +385,8 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 		'5,4' => 'air2',
 		'5,1' => 'mini4',
 		'5,2' => 'mini4',
+	    '6,3' => 'pro97',
+	    '6,4' => 'pro97',
 	    '6,7' => 'pro',
 	    '6,8' => 'pro',
 	);
@@ -440,7 +468,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 			}
 		}
 		
-		$tolerance = $this->userAgent->indexOf('_');
+		$tolerance = $this->userAgent->firstChar('_');
 		if ($tolerance !== false) {
 			// The first char after the first underscore
 			$tolerance++;
@@ -469,7 +497,7 @@ class AppleUserAgentMatcher extends UserAgentMatcher {
 	}
 	
 	public function applyRecoveryMatch() {
-		if (preg_match('/ (\d)_(\d)[ _]/', $this->userAgent, $matches)) {
+		if (preg_match('/ (\d+)_(\d+)[ _]/', $this->userAgent, $matches)) {
 			$major_version = (int)$matches[1];
 			$minor_version = (int)$matches[2];
 		} else {

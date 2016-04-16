@@ -37,16 +37,7 @@ class CatchAllMozillaUserAgentMatcher extends UserAgentMatcher {
 
     public function applyConclusiveMatch() {
         $this->match_type = 'conclusive';
-
-        if (TeraWurflConfig::$SIMPLE_DESKTOP_ENGINE_ENABLE === true) {
-            //High performance mode
-            $tolerance = $this->userAgent->firstCloseParen();
-            return $this->risMatch($tolerance);
-        } else {
-            //High accuracy mode
-            $deviceID = $this->ldMatch(5);
-            if ($deviceID != WurflConstants::NO_MATCH) $this->match = true;
-            return $deviceID;
-        }
+        $tolerance = $this->userAgent->firstCloseParen();
+        return $this->risMatch($tolerance);
     }
 }

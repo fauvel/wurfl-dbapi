@@ -60,6 +60,7 @@ class VirtualCapabilityProvider {
 		'advertised_browser' => 'DeviceBrowser.Browser',
 		'advertised_browser_version' => 'DeviceBrowser.BrowserVersion',
 		'complete_device_name' => 'CompleteDeviceName',
+	    'device_name' => 'DeviceName',
 		'form_factor' => 'FormFactor',
 		'is_phone' => 'IsPhone',
 		'is_app_webview' => 'IsAppWebview',
@@ -109,6 +110,19 @@ class VirtualCapabilityProvider {
 			unset($model);
 		}
 		
+		return $caps;
+	}
+
+	/**
+	 * Returns an array of all the control capabilities
+	 * @return array
+	 */
+	public static function getControlCapabilities()
+	{
+		$caps = array();
+		foreach (self::$virtual_capabilities as $cap_name => $vc_name) {
+			$caps[] = self::PREFIX_CONTROL . $cap_name;
+		}
 		return $caps;
 	}
 	

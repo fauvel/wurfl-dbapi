@@ -221,6 +221,7 @@ class WurflConstants {
 	    ' mb91/',
 	    ' mb95/',
 	    'vizio-dtv',
+	    'bravia',
 	);
 
 	/**

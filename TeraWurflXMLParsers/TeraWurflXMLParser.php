@@ -73,7 +73,11 @@ abstract class TeraWurflXMLParser {
     public function __construct() {
     	if (TeraWurflConfig::$CAPABILITY_FILTER && is_array(TeraWurflConfig::$CAPABILITY_FILTER)) {
 			// Merge given capabilities and capabilities required for virtual capabilities
-			$this->capability_filter = array_unique(array_merge(TeraWurflConfig::$CAPABILITY_FILTER, VirtualCapabilityProvider::getRequiredCapabilities()));
+			$this->capability_filter = array_unique(array_merge(
+				TeraWurflConfig::$CAPABILITY_FILTER,
+				VirtualCapabilityProvider::getRequiredCapabilities(),
+				VirtualCapabilityProvider::getControlCapabilities()
+			));
     	}
     }
     /**

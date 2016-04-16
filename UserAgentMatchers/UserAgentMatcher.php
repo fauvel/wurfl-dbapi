@@ -156,19 +156,6 @@ abstract class UserAgentMatcher {
     	return $deviceID;
     }
     /**
-     * Attempts to match given user agent string to a device from the database by calculating their Levenshtein Distance (LD)
-     * @param int $tolerance Tolerance, how much difference is allowed
-     * @return string WURFL ID
-     */
-    public function ldMatch($tolerance=null) {
-    	if ($this->simulation) return WurflConstants::NO_MATCH;
-    	if ($this->wurfl->db->db_implements_ld) {
-    		return $this->wurfl->db->getDeviceFromUA_LD($this->userAgent->normalized, $tolerance, $this);
-    	}
-    	$this->updateDeviceList();
-    	return UserAgentUtils::ldMatch($this->userAgent->normalized, $tolerance, $this);
-    }
-    /**
      * Returns the name of the UserAgentMatcher in use
      * @return string UserAgentMatcher name
      */

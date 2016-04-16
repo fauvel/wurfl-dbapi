@@ -39,6 +39,7 @@ class TeraWurflHttpRequest {
 	private $_user_agent_search_order = array(
 		'HTTP_DEVICE_STOCK_UA',
 		'HTTP_X_OPERAMINI_PHONE_UA',
+	    'HTTP_X_UCBROWSER_DEVICE_UA',
 		'HTTP_USER_AGENT',
 	);
 	private $_user_agent_key;

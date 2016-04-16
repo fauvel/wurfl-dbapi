@@ -97,7 +97,7 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 	
 		// iPhone U3K
 		else if ($this->userAgent->contains('iPhone;')) {
-			if (preg_match('/iPhone OS (\d+)(?:_(\d+))?(?:_\d+)* like/', $this->userAgent, $matches)) {
+			if (preg_match('/iPhone OS (\d+)_(\d+)(?:_\d+)* like/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$prefix = "$version U3iPhone $ucb_version".WurflConstants::RIS_DELIMITER;
 				$this->userAgent->set($prefix.$this->userAgent);
@@ -107,7 +107,7 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 			
 		// iPad U3K
 		else if ($this->userAgent->contains('iPad')) {
-			if (preg_match('/CPU OS (\d)_?(\d)?.+like Mac.+; iPad([0-9,]+)\) AppleWebKit/', $this->userAgent, $matches)) {
+			if (preg_match('/CPU OS (\d+)_(\d+)?.+like Mac.+; iPad([0-9,]+)\) AppleWebKit/', $this->userAgent, $matches)) {
 				$version = $matches[1].'.'.$matches[2];
 				$model = $matches[3];
 				$prefix = "$version U3iPad $ucb_version $model".WurflConstants::RIS_DELIMITER;
@@ -122,69 +122,95 @@ class UcwebU3UserAgentMatcher extends UserAgentMatcher {
 
 	public function applyRecoveryMatch() {
 		
-		// Windows Phone
-		if ($this->userAgent->contains('Windows Phone')) {
-			$version = WindowsPhoneUserAgentMatcher::getWindowsPhoneVersion($this->userAgent);
-			$significant_version = explode('.', $version);
-			if ($significant_version[0] !== null) {
-				if ($significant_version[1] === 0) {
-					$deviceID = 'generic_ms_phone_os'.$significant_version[0].'_subuaucweb';	
-				}
-				else {
-					$deviceID = 'generic_ms_phone_os'.$significant_version[0].'_'.$significant_version[1].'_subuaucweb';
-				}
-				
-				if (in_array($deviceID, self::$constantIDs)) {
-					return $deviceID;
-				}
-			}
-			return 'generic_ms_phone_os8_subuaucweb';
+		// Windows Phone U3K
+	    if ($deviceID = $this->applyRecoveryWindowsPhone()) {
+	        return $deviceID;
+	    }
+
+		// Android U3K Mobile + Tablet. This will also handle UCWEB7 recovery and point it to the UCWEB generic IDs.
+		if ($deviceID = $this->applyRecoveryAndroid()) {
+		    return $deviceID;
 		}
 		
-		// Android U3K Mobile + Tablet. This will also handle UCWEB7 recovery and point it to the UCWEB generic IDs.
-		else if ($this->userAgent->contains('Android')) {
-			$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
-			$significant_version = explode('.', $version);
-			if ($significant_version[0] !== null) {
-				$deviceID = 'generic_ucweb_android_ver'.$significant_version[0];
-				if (in_array($deviceID, self::$constantIDs)) {
-					return $deviceID;
-				}
-			}
-				
-			return 'generic_ucweb_android_ver1';
-		}
-
 		// iPhone U3K
-		else if ($this->userAgent->contains('iPhone;')) {
-			if (preg_match('/iPhone OS (\d+)(?:_\d+)?.+ like/', $this->userAgent, $matches)) {
-				$significant_version = $matches[1];
-				$deviceID = 'apple_iphone_ver'.$significant_version.'_subuaucweb';
-				if (in_array($deviceID, self::$constantIDs)) {
-					return $deviceID;
-				}
-			}
-				
-			return 'apple_iphone_ver1_subuaucweb';
+		if ($deviceID = $this->applyRecoveryiPhone()) {
+		    return $deviceID;
 		}
-
 
 		// iPad U3K
-		else if ($this->userAgent->contains('iPad')) {
-				
-			if (preg_match('/CPU OS (\d+)(?:_\d+)?.+like Mac/', $this->userAgent, $matches)) {
-				$significant_version = $matches[1];
-				$deviceID = 'apple_ipad_ver1_sub'.$significant_version.'_subuaucweb';
-				if (in_array($deviceID, self::$constantIDs)) {
-					return $deviceID;
-				}
-			}
-				
-			return 'apple_ipad_ver1_subuaucweb';
+		if ($deviceID = $this->applyRecoveryiPad()) {
+		    return $deviceID;
 		}
-			
+
 		return 'generic_ucweb';
 
+	}
+	
+	private function applyRecoveryWindowsPhone() {
+		if (!$this->userAgent->contains('Windows Phone')) {
+            return null;   
+        }    
+        $version = WindowsPhoneUserAgentMatcher::getWindowsPhoneVersion($this->userAgent);
+        $significant_version = explode('.', $version);
+        //Make sure major and minor versions are both present
+        if (count($significant_version) >= 2) {
+            $major = $significant_version[0];
+            $minor = $significant_version[1];
+            //If there is no minor version
+            if ($minor === 0) {
+                $deviceID = 'generic_ms_phone_os'.$major.'_subuaucweb';    
+            } else {
+                $deviceID = 'generic_ms_phone_os'.$major.'_'.$minor.'_subuaucweb';
+            }
+            if (in_array($deviceID, self::$constantIDs)) {
+                return $deviceID;
+            }
+        }
+        return 'generic_ms_phone_os8_subuaucweb';
+	}
+	
+	private function applyRecoveryAndroid() {
+	    if (!$this->userAgent->contains('Android')) {
+	        return null;
+	    }
+		$version = AndroidUserAgentMatcher::getAndroidVersion($this->userAgent, false);
+		$significant_version = explode('.', $version);
+		//We only care about major version
+        if (count($significant_version) >= 1) {
+            $deviceID = 'generic_ucweb_android_ver'.$significant_version[0];
+			if (in_array($deviceID, self::$constantIDs)) {
+				return $deviceID;
+			}
+		}
+        return 'generic_ucweb_android_ver1';
+	}
+	
+	private function applyRecoveryiPhone() {
+	    if (!$this->userAgent->contains('iPhone')) {
+	        return null;
+	    }
+		if (preg_match('/iPhone OS (\d+)(?:_\d+)?.+ like/', $this->userAgent, $matches)) {
+			$significant_version = $matches[1];
+			$deviceID = 'apple_iphone_ver'.$significant_version.'_subuaucweb';
+			if (in_array($deviceID, self::$constantIDs)) {
+				return $deviceID;
+			}
+		}
+		return 'apple_iphone_ver1_subuaucweb';
+	}
+	
+	private function applyRecoveryiPad() {
+	    if (!$this->userAgent->contains('iPad')) {
+	        return null;
+	    }
+		if (preg_match('/CPU OS (\d+)(?:_\d+)?.+like Mac/', $this->userAgent, $matches)) {
+			$significant_version = $matches[1];
+			$deviceID = 'apple_ipad_ver1_sub'.$significant_version.'_subuaucweb';
+			if (in_array($deviceID, self::$constantIDs)) {
+				return $deviceID;
+			}
+		}
+		return 'apple_ipad_ver1_subuaucweb';
 	}
 	
 	public static function getUcBrowserVersion($ua, $use_default=true) {

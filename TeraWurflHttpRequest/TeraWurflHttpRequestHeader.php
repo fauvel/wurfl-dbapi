@@ -263,6 +263,15 @@ class TeraWurflHttpRequestHeader {
     }
 
 	/**
+	 * The character position of the first matching including the char itself.  If there are no occurrences, returns null
+	 * @param $char
+	 * @return int|null Character position
+	 */
+	public function firstChar($char) {
+		return $this->findCharPosition($this->_normalized, $char);
+	}
+
+	/**
 	 * Returns the character position of the $target string, starting from $startingIndex
 	 * @param string $target
 	 * @param int $startingIndex
